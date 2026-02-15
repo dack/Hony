@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - JONY ESPORTS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #F3F4F6; --bg-secondary: #FFFFFF; --text-primary: #111827;
+            --text-secondary: #6B7280; --accent-primary: #4F46E5; --accent-secondary: #10B981;
+            --border-color: #E5E7EB; --danger-color: #EF4444;
+        }
+        body { background-color: var(--bg-primary); color: var(--text-primary); font-family: 'Poppins', sans-serif; }
+        .main-content { padding-top: 80px; padding-bottom: 40px; }
+        .section { display: none; } .section.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .app-header { background-color: var(--bg-secondary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .app-header .navbar-brand { font-weight: 700; color: var(--accent-primary); }
+        .app-header .nav-link { color: var(--text-secondary); font-weight: 500; }
+        .app-header .nav-link.active { color: var(--accent-primary); font-weight: 600; }
+        .login-container { max-width: 400px; margin: 15vh auto; }
+        .card { background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.75rem; }
+        .dash-card { text-align: center; padding: 1.5rem; }
+        .dash-card h1 { font-size: 2.5rem; font-weight: 700; color: var(--accent-primary); }
+        .dash-card p { font-size: 1rem; color: var(--text-secondary); }
+        .form-control, .form-select { background-color: #F9FAFB; border: 1px solid var(--border-color); }
+        .form-control:focus, .form-select:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .btn-primary { background-color: var(--accent-primary); border: none; font-weight: 600; }
+        .control-menu .list-group-item.active { background-color: #EEF2FF; border-left-color: var(--accent-primary); color: var(--accent-primary); font-weight: 600; }
+        .management-pane { display: none; } .management-pane.active { display: block; }
+        .table img { width: 50px; height: 50px; object-fit: cover; border-radius: 0.5rem; }
+        #adminLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner-border { color: var(--accent-primary); }
+        h4.card-title { border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-weight: 600; color: var(--accent-primary); }
+        .upload-status { font-size: 0.8rem; margin-top: 5px; color: var(--text-secondary); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; display: none; justify-content: center; align-items: center; overflow-y: auto;}
+        .modal-box { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .nav-tabs .nav-link { color: var(--text-secondary); cursor: pointer; }
+        .nav-tabs .nav-link.active { color: var(--accent-primary); font-weight: 600; }
+        .participant-list { max-height: 300px; overflow-y: auto; }
+        .p-item { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        
+        .announcement-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Notification specific styles */
+        .notification-preview-card {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .notification-preview {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .notification-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        .notification-body {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        .notification-time {
+            font-size: 0.8rem;
+            color: #999;
+            text-align: right;
+        }
+        .user-tokens-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fafafa;
+        }
+        .token-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
+        }
+        .token-item:last-child {
+            border-bottom: none;
+        }
+        .token-uid {
+            color: #4F46E5;
+            font-weight: 500;
+        }
+        .token-status {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-inactive { background: #fee2e2; color: #991b1b; }
+        
+        /* FCM Server Key Input */
+        .server-key-card {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .server-key-input {
+            background: rgba(255,255,255,0.9);
+            border: 2px solid white;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Room Details Section */
+        .room-details-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+        .room-detail-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .room-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+        .room-value {
+            flex: 1;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #212529;
+            padding: 8px 12px;
+            background: #f1f3f5;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+        }
+        .copy-btn {
+            min-width: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="adminLoader" style="display: none;"><div class="spinner-border" role="status"></div></div>
+
+    <div id="auth-container">
+        <div id="admin-setup-section" style="display: none;">
+            <div class="container login-container"><div class="card"><div class="card-body p-4 p-md-5">
+                <h2 class="card-title text-center mb-4">Admin Setup</h2>
+                <form id="adminSetupForm">
+                    <div class="mb-3"><label>Admin Email</label><input type="email" class="form-control" id="setupEmail" required></div>
+                    <div class="mb-3"><label>Password</label><input type="password" class="form-control" id="setupPassword" required minlength="6"></div>
+                    <div id="adminSetupStatus" class="mt-3"></div>
+                    <div class="d-grid mt-4"><button type="submit" class="btn btn-success fw-bold py-2">Create Account</button></div>
+                </form>
+            </div></div></div>
+        </div>
+        <div id="admin-login-section" style="display: none;">
+            <div class="container login-container"><div class="card"><div class="card-body p-4 p-md-5">
+                <h2 class="card-title text-center mb-4">Admin Login</h2>
+                <form id="adminLoginForm">
+                    <div class="mb-3"><label>Email</label><input type="email" class="form-control" id="adminEmail" required></div>
+                    <div class="mb-3"><label>Password</label><input type="password" class="form-control" id="adminPassword" required></div>
+                    <div id="adminLoginStatus" class="mt-3"></div>
+                    <div class="d-grid mt-4"><button type="submit" class="btn btn-primary fw-bold py-2">Login</button></div>
+                </form>
+            </div></div></div>
+        </div>
+    </div>
+
+    <div id="admin-main-area" style="display: none;">
+        <header class="app-header fixed-top">
+            <nav class="navbar w-100">
+                <div class="container">
+                    <a class="navbar-brand" href="#">CG Admin</a>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><a class="nav-link active" href="#" data-section="dashboard-section">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-section="control-section">Controls</a></li>
+                    </ul>
+                    <button class="btn btn-outline-danger btn-sm" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="main-content container">
+            <div id="globalStatus"></div>
+            <section id="dashboard-section" class="section"></section>
+            <section id="control-section" class="section"></section>
+        </main>
+    </div>
+
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal-box">
+            <h4>Edit User</h4>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="mb-3">
+                    <label>Display Name</label>
+                    <input type="text" id="editUserName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Wallet Balance (₹)</label>
+                    <input type="number" id="editUserBalance" class="form-control" step="0.01" required>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editSliderModal" class="modal-overlay">
+        <div class="modal-box">
+            <h4>Edit Slider</h4>
+            <form id="editSliderForm">
+                <input type="hidden" id="editSliderId">
+                <div class="mb-3">
+                    <label>Image URL</label>
+                    <input type="text" id="editSliderImage" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Redirect Link (Optional)</label>
+                    <input type="text" id="editSliderLink" class="form-control" placeholder="https://example.com">
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editSliderModal')">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="matchManagerModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 700px;">
+            <div class="modal-header">
+                <h5 class="m-0">Match Manager</h5>
+                <button type="button" class="btn-close" onclick="closeModal('matchManagerModal')"></button>
+            </div>
+            
+            <ul class="nav nav-tabs mb-3" id="matchTabs">
+                <li class="nav-item"><a class="nav-link active" data-tab="mm-status">Status & Room</a></li>
+                <li class="nav-item"><a class="nav-link" data-tab="mm-participants">Participants</a></li>
+                <li class="nav-item"><a class="nav-link" data-tab="mm-results">Publish Result</a></li>
+            </ul>
+
+            <div id="mm-content">
+                <input type="hidden" id="mmMatchId">
+                
+                <div id="mm-status" class="mm-tab-pane">
+                    <div class="mb-3">
+                        <label>Match Status</label>
+                        <select id="mmStatusSelect" class="form-select">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed (Show Results)</option>
+                        </select>
+                        <small class="text-muted">Set to 'Completed' to show Leaderboard in App.</small>
+                    </div>
+                    
+                    <!-- Room Details Section -->
+                    <div class="room-details-section">
+                        <h6 class="mb-3"><i class="bi bi-door-closed"></i> Room Details</h6>
+                        <div class="room-detail-row">
+                            <div class="room-label">Room ID</div>
+                            <input type="text" id="mmRoomId" class="form-control room-value" placeholder="Enter Room ID">
+                            <button type="button" class="btn btn-primary copy-btn" onclick="copyToClipboard('mmRoomId')">
+                                <i class="bi bi-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="room-detail-row">
+                            <div class="room-label">Password</div>
+                            <input type="text" id="mmPass" class="form-control room-value" placeholder="Enter Password">
+                            <button type="button" class="btn btn-primary copy-btn" onclick="copyToClipboard('mmPass')">
+                                <i class="bi bi-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle"></i> Room details will be visible to users in real-time when published.
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100 mt-3" id="btnSaveRoomInfo">Save Status & Room Info</button>
+                </div>
+
+                <div id="mm-participants" class="mm-tab-pane" style="display:none;">
+                    <div class="participant-list mb-3" id="mmParticipantsList">
+                    </div>
+                    <div class="alert alert-info py-2">Total Joined: <span id="mmJoinedCount">0</span></div>
+                </div>
+
+                <div id="mm-results" class="mm-tab-pane" style="display:none;">
+                    <form id="addResultForm" class="row g-2 mb-3 align-items-end">
+                        <div class="col-4">
+                            <label>Player Name</label>
+                            <input type="text" id="resPlayerName" class="form-control" placeholder="Exact Name" required>
+                        </div>
+                        <div class="col-2">
+                            <label>Rank</label>
+                            <input type="number" id="resRank" class="form-control" placeholder="#" required>
+                        </div>
+                        <div class="col-2">
+                            <label>Kills</label>
+                            <input type="number" id="resKills" class="form-control" placeholder="0" required>
+                        </div>
+                        <div class="col-2">
+                            <label>Win ₹</label>
+                            <input type="number" id="resWin" class="form-control" placeholder="0" required>
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-success w-100">+</button>
+                        </div>
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th>#</th><th>Name</th><th>Kills</th><th>Win</th><th>Act</th></tr></thead>
+                            <tbody id="mmResultsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, set, push, remove, update, serverTimestamp, runTransaction, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        
+        const firebaseConfig = {
+  apiKey: "AIzaSyDQuNyp6wsubAtq0_5IFmgrklt0qrlob_w",
+  authDomain: "battle-boy-7d4b8.firebaseapp.com",
+  databaseURL: "https://battle-boy-7d4b8-default-rtdb.firebaseio.com",
+  projectId: "battle-boy-7d4b8",
+  storageBucket: "battle-boy-7d4b8.firebasestorage.app",
+  messagingSenderId: "44275813026",
+  appId: "1:44275813026:web:758209b1a5f26495bbe5fb",
+  measurementId: "G-90VV8GHQZN"
+};
+        const IMGBB_API_KEY = "52374940a6cadc3c3be0089b75399ec7"; 
+        const VAPID_KEY = "BOBOinYkBFbVv_nmpoEpFzbl7R_rVe7O_MOWrgatpGOO9fJnkvrJXWPZX_YYaQARapN6-AQ1FYWdK7P1aLD5ADA";
+
+        let app, db, auth;
+        try { 
+            app = initializeApp(firebaseConfig); 
+            db = getDatabase(app); 
+            auth = getAuth(app); 
+        } catch (e) { 
+            console.error(e); 
+            alert("Firebase initialization failed: " + e.message);
+        }
+
+        const showLoader = (show) => document.getElementById('adminLoader').style.display = show ? 'flex' : 'none';
+        const showStatus = (msg, type='success') => {
+            document.getElementById('globalStatus').innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show">
+                    ${msg}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+        };
+        
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        
+        window.copyToClipboard = (elementId) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.select();
+                element.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(element.value).then(() => {
+                    showStatus('Copied to clipboard!');
+                });
+            }
+        };
+
+        let dbListeners = {};
+
+        onAuthStateChanged(auth, async (user) => {
+            showLoader(true);
+            try {
+                const configSnap = await get(ref(db, 'adminConfig'));
+                const isSetup = configSnap.exists() && configSnap.val().setupComplete;
+                
+                if (user && isSetup && user.uid === configSnap.val().adminUid) {
+                    document.getElementById('auth-container').style.display = 'none';
+                    document.getElementById('admin-main-area').style.display = 'block';
+                    showSection('dashboard-section');
+                } else {
+                    document.getElementById('admin-main-area').style.display = 'none';
+                    document.getElementById('auth-container').style.display = 'block';
+                    document.getElementById('admin-login-section').style.display = isSetup ? 'block' : 'none';
+                    document.getElementById('admin-setup-section').style.display = isSetup ? 'none' : 'block';
+                }
+            } catch (error) {
+                console.error("Auth state error:", error);
+                showStatus("Error checking authentication", 'danger');
+            } finally {
+                showLoader(false);
+            }
+        });
+
+        function showSection(sectionId) {
+            Object.values(dbListeners).forEach(unsub => unsub && unsub());
+            dbListeners = {};
+
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.app-header .nav-link').forEach(l => l.classList.toggle('active', l.dataset.section === sectionId));
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'dashboard-section') setupDashboardListener();
+            if (sectionId === 'control-section') renderControlPanel();
+        }
+        
+        document.querySelectorAll('[data-section]').forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
+                showSection(e.target.dataset.section);
+            });
+        });
+
+        function setupDashboardListener() {
+            const section = document.getElementById('dashboard-section');
+            section.innerHTML = `<div class="d-flex justify-content-center p-5"><div class="spinner-border"></div></div>`;
+            
+            const updateDash = async () => {
+                try {
+                    const [t, u, d, w] = await Promise.all([
+                        get(ref(db, 'tournaments')), 
+                        get(ref(db, 'users')), 
+                        get(ref(db, 'deposits')), 
+                        get(ref(db, 'withdrawals'))
+                    ]);
+                    
+                    let pendingDep = 0; 
+                    if(d.exists()) {
+                        Object.values(d.val()).forEach(x => { 
+                            if(x.status === 'pending') pendingDep++ 
+                        });
+                    }
+                    
+                    let pendingWd = 0; 
+                    if(w.exists()) {
+                        Object.values(w.val()).forEach(x => { 
+                            if(x.status === 'pending') pendingWd++ 
+                        });
+                    }
+                    
+                    section.innerHTML = `
+                        <h2 class="mb-4">Dashboard</h2>
+                        <div class="row">
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card dash-card text-success">
+                                    <h1>${pendingDep}</h1>
+                                    <p>Pending Deposits</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card dash-card text-danger">
+                                    <h1>${pendingWd}</h1>
+                                    <p>Pending Withdrawals</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card dash-card">
+                                    <h1>${t.exists() ? Object.keys(t.val()).length : 0}</h1>
+                                    <p>Matches</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card dash-card">
+                                    <h1>${u.exists() ? Object.keys(u.val()).length : 0}</h1>
+                                    <p>Users</p>
+                                </div>
+                            </div>
+                        </div>`;
+                } catch (error) {
+                    console.error("Dashboard update error:", error);
+                    section.innerHTML = `<div class="alert alert-danger">Error loading dashboard data</div>`;
+                }
+            };
+            updateDash();
+        }
+
+        function renderControlPanel() {
+            document.getElementById('control-section').innerHTML = `
+                <div class="row">
+                    <div class="col-lg-3 mb-4">
+                        <div class="card">
+                            <div class="list-group list-group-flush control-menu" id="controlMenu">
+                                <a href="#" class="list-group-item list-group-item-action active" data-pane="manageTransactions">
+                                    <i class="bi bi-wallet2"></i> Transactions
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageUsers">
+                                    <i class="bi bi-people-fill"></i> Users
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageMatches">
+                                    <i class="bi bi-trophy-fill"></i> Matches
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageCategories">
+                                    <i class="bi bi-grid-fill"></i> Categories
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageSliders">
+                                    <i class="bi bi-images"></i> Sliders
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageLogo">
+                                    <i class="bi bi-image"></i> App Logo
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="managePrivacy">
+                                    <i class="bi bi-shield-lock-fill"></i> Privacy Policy
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageAnnouncement">
+                                    <i class="bi bi-megaphone-fill"></i> Announcements
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageNotifications">
+                                    <i class="bi bi-bell-fill"></i> Push Notifications
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action" data-pane="manageFCM">
+                                    <i class="bi bi-gear-fill"></i> FCM Settings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
+                        <div id="managementPanesContainer"></div>
+                    </div>
+                </div>`;
+            
+            setupPaneListener('manageTransactions');
+            
+            document.getElementById('controlMenu').addEventListener('click', e => {
+                const target = e.target.closest('a');
+                if (target) {
+                    e.preventDefault();
+                    document.querySelectorAll('.control-menu a').forEach(el => el.classList.remove('active'));
+                    target.classList.add('active');
+                    if(dbListeners.pane) dbListeners.pane();
+                    setupPaneListener(target.dataset.pane);
+                }
+            });
+        }
+
+        function setupPaneListener(paneId) {
+            const container = document.getElementById('managementPanesContainer');
+            container.innerHTML = `<div class="d-flex justify-content-center p-5"><div class="spinner-border"></div></div>`;
+
+            if (paneId === 'manageTransactions') {
+                let depositsData = {};
+                let withdrawalsData = {};
+
+                const renderTransactions = () => {
+                    let depRows = '';
+                    Object.entries(depositsData).forEach(([id, data]) => {
+                        if(data.status === 'pending') {
+                            depRows += `<tr>
+                                <td>${data.orderId || 'N/A'}<br><small>${data.timestamp ? new Date(data.timestamp).toLocaleDateString() : ''}</small></td>
+                                <td class="fw-bold text-success">₹${data.amount}</td>
+                                <td>UPI: ${data.upiId}<br>UTR: ${data.utr}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success action-btn" data-action="approveDeposit" data-id="${id}" data-uid="${data.userId}" data-amt="${data.amount}">✔</button>
+                                    <button class="btn btn-sm btn-danger action-btn" data-action="rejectDeposit" data-id="${id}">✖</button>
+                                </td>
+                            </tr>`;
+                        }
+                    });
+
+                    let wdRows = '';
+                    Object.entries(withdrawalsData).forEach(([id, data]) => {
+                        if(data.status === 'pending') {
+                            wdRows += `<tr>
+                                <td>${data.timestamp ? new Date(data.timestamp).toLocaleDateString() : 'N/A'}</td>
+                                <td class="fw-bold text-danger">₹${data.amount}</td>
+                                <td>UPI: ${data.upi}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success action-btn" data-action="approveWithdrawal" data-id="${id}">✔</button>
+                                    <button class="btn btn-sm btn-danger action-btn" data-action="rejectWithdrawal" data-id="${id}" data-uid="${data.userId}" data-amt="${data.amount}">✖</button>
+                                </td>
+                            </tr>`;
+                        }
+                    });
+
+                    container.innerHTML = `
+                        <div class="card mb-4">
+                            <div class="card-header fw-bold bg-white text-success">Pending Deposits</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Amount</th>
+                                                <th>Details</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${depRows || '<tr><td colspan="4" class="text-center text-muted p-3">No pending deposits.</td></tr>'}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header fw-bold bg-white text-danger">Pending Withdrawals</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                                <th>UPI Details</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${wdRows || '<tr><td colspan="4" class="text-center text-muted p-3">No pending withdrawals.</td></tr>'}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>`;
+                    
+                    attachActionListeners();
+                };
+
+                const unsubDep = onValue(ref(db, 'deposits'), (snapshot) => {
+                    depositsData = snapshot.val() || {};
+                    renderTransactions();
+                });
+
+                const unsubWd = onValue(ref(db, 'withdrawals'), (snapshot) => {
+                    withdrawalsData = snapshot.val() || {};
+                    renderTransactions();
+                });
+
+                dbListeners.pane = () => { 
+                    unsubDep(); 
+                    unsubWd(); 
+                };
+            }
+            else if (paneId === 'manageUsers') {
+                dbListeners.pane = onValue(ref(db, 'users'), (snapshot) => {
+                    let rows = '';
+                    if(snapshot.exists()) {
+                        snapshot.forEach(child => {
+                            const u = child.val();
+                            rows += `<tr>
+                                <td>${u.displayName || 'No Name'}</td>
+                                <td>${u.email || 'No Email'}</td>
+                                <td class="fw-bold">₹${u.balance || 0}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary edit-user-btn" 
+                                        data-uid="${child.key}" 
+                                        data-name="${u.displayName || ''}" 
+                                        data-bal="${u.balance || 0}">
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" 
+                                        data-type="users" 
+                                        data-id="${child.key}">
+                                        Del
+                                    </button>
+                                </td>
+                            </tr>`;
+                        });
+                    }
+                    container.innerHTML = `
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0 align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Balance</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${rows}</tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>`;
+                    
+                    document.querySelectorAll('.edit-user-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const uid = btn.dataset.uid;
+                            const name = btn.dataset.name;
+                            const bal = btn.dataset.bal;
+                            
+                            document.getElementById('editUserId').value = uid;
+                            document.getElementById('editUserName').value = name;
+                            document.getElementById('editUserBalance').value = bal;
+                            document.getElementById('editUserModal').style.display = 'flex';
+                        });
+                    });
+                    attachActionListeners();
+                });
+            }
+            else if (paneId === 'manageNotifications') {
+                renderNotificationPanel(container);
+            }
+            else if (paneId === 'manageFCM') {
+                renderFCMSettingsPanel(container);
+            }
+            else {
+                renderStaticPane(paneId, container);
+            }
+        }
+
+        function renderFCMSettingsPanel(container) {
+            container.innerHTML = `
+                <div class="server-key-card">
+                    <h5><i class="bi bi-key"></i> FCM Server Key Configuration</h5>
+                    <p class="small mb-3">Enter your Firebase Cloud Messaging Server Key for sending push notifications</p>
+                    <div class="mb-3">
+                        <label class="form-label text-white">Server Key</label>
+                        <input type="text" class="form-control server-key-input" id="fcmServerKey" placeholder="AAAA...">
+                        <small class="text-white-50">Get this from Firebase Console > Project Settings > Cloud Messaging > Server Key</small>
+                    </div>
+                    <button class="btn btn-light w-100" id="saveFCMKeyBtn">
+                        <i class="bi bi-save"></i> Save Server Key
+                    </button>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-info-circle"></i> How to Get FCM Server Key</h5>
+                        <ol class="mb-0">
+                            <li>Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a></li>
+                            <li>Select your project (hsyt-esports-ce2ef)</li>
+                            <li>Click the gear icon > Project Settings</li>
+                            <li>Go to "Cloud Messaging" tab</li>
+                            <li>Copy the "Server Key" under "Project credentials"</li>
+                            <li>Paste it in the field above and save</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-shield-check"></i> Security Notice</h5>
+                        <p class="text-muted small">This key will be stored in your Firebase database and used to send notifications directly from the admin panel. Keep it secure.</p>
+                    </div>
+                </div>`;
+            
+            // Load existing key
+            get(ref(db, 'settings/fcmServerKey')).then(snap => {
+                if (snap.exists()) {
+                    document.getElementById('fcmServerKey').value = snap.val();
+                }
+            });
+            
+            document.getElementById('saveFCMKeyBtn').addEventListener('click', async () => {
+                const key = document.getElementById('fcmServerKey').value.trim();
+                if (!key) {
+                    showStatus('Please enter Server Key', 'danger');
+                    return;
+                }
+                
+                showLoader(true);
+                try {
+                    await set(ref(db, 'settings/fcmServerKey'), key);
+                    showStatus('FCM Server Key saved successfully');
+                } catch (error) {
+                    console.error('Error saving key:', error);
+                    showStatus('Error saving key: ' + error.message, 'danger');
+                } finally {
+                    showLoader(false);
+                }
+            });
+        }
+
+        function renderNotificationPanel(container) {
+            container.innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Send Push Notification</h5>
+                                <form id="notificationForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Notification Title</label>
+                                            <input type="text" class="form-control" id="notifTitle" placeholder="Enter title" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Target Users</label>
+                                            <select class="form-select" id="notifTarget">
+                                                <option value="all">All Users</option>
+                                                <option value="specific">Specific User</option>
+                                                <option value="players">Active Players Only</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3" id="specificUserSection" style="display:none;">
+                                        <label class="form-label">User ID</label>
+                                        <input type="text" class="form-control" id="specificUserId" placeholder="Enter user UID">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Message</label>
+                                        <textarea class="form-control" id="notifMessage" rows="3" placeholder="Enter notification message" required></textarea>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Icon URL (Optional)</label>
+                                            <input type="url" class="form-control" id="notifIcon" placeholder="https://example.com/icon.png">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Image URL (Optional)</label>
+                                            <input type="url" class="form-control" id="notifImage" placeholder="https://example.com/image.png">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Click Action URL</label>
+                                            <input type="url" class="form-control" id="notifUrl" placeholder="https://hsytesports.in" value="https://hsytesports.in">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Notification Tag</label>
+                                            <input type="text" class="form-control" id="notifTag" placeholder="match-update" value="hsyt-notification">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="notification-preview-card">
+                                        <h6>Preview</h6>
+                                        <div class="notification-preview">
+                                            <div class="notification-title" id="previewTitle">Notification Title</div>
+                                            <div class="notification-body" id="previewMessage">Notification message will appear here</div>
+                                            <div class="notification-time">Just now</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2 mt-3">
+                                        <button type="submit" class="btn btn-primary flex-grow-1">
+                                            <i class="bi bi-send"></i> Send Notification
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary" id="testNotifBtn">
+                                            <i class="bi bi-bell"></i> Test
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Sent Notifications</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Message</th>
+                                                <th>Sent To</th>
+                                                <th>Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sentNotificationsList">
+                                            <tr><td colspan="4" class="text-center text-muted">Loading...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Users with Push Enabled</h5>
+                                <div class="user-tokens-list" id="userTokensList">
+                                    <div class="text-center text-muted py-3">Loading users...</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Quick Send</h5>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary" data-quick-title="🎮 New Tournament!" data-quick-msg="Join our new tournament starting soon! Big prizes await!">Tournament Alert</button>
+                                    <button class="btn btn-outline-success" data-quick-title="💰 Withdrawal Processed" data-quick-msg="Your withdrawal has been processed! Check your UPI.">Withdrawal Update</button>
+                                    <button class="btn btn-outline-warning" data-quick-title="⚠️ Server Maintenance" data-quick-msg="Server maintenance in 30 minutes. Save your progress.">Maintenance Alert</button>
+                                    <button class="btn btn-outline-info" data-quick-title="🎉 New Feature!" data-quick-msg="Check out our updated leaderboard system with real-time stats!">New Feature</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load data
+            loadSentNotifications();
+            loadUserTokens();
+            setupNotificationListeners();
+        }
+
+        async function loadSentNotifications() {
+            try {
+                const snap = await get(ref(db, 'notifications'));
+                const list = document.getElementById('sentNotificationsList');
+                
+                if (!snap.exists()) {
+                    list.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No notifications sent yet</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                const notifications = [];
+                
+                snap.forEach(child => {
+                    notifications.push({ id: child.key, ...child.val() });
+                });
+                
+                // Sort by timestamp descending
+                notifications.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                
+                notifications.slice(0, 20).forEach(notif => {
+                    const date = notif.timestamp ? new Date(notif.timestamp).toLocaleString() : 'N/A';
+                    const target = notif.target === 'all' ? 'All Users' : 
+                                 notif.target === 'specific' ? 'Specific User' : 
+                                 notif.target === 'players' ? 'Active Players' : notif.target;
+                    
+                    html += `
+                        <tr>
+                            <td><strong>${notif.title || 'No title'}</strong></td>
+                            <td class="text-truncate" style="max-width: 150px;">${notif.body || notif.message || ''}</td>
+                            <td><span class="badge bg-secondary">${target}</span></td>
+                            <td><small class="text-muted">${date}</small></td>
+                        </tr>
+                    `;
+                });
+                
+                list.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading notifications:", error);
+                document.getElementById('sentNotificationsList').innerHTML = 
+                    '<tr><td colspan="4" class="text-center text-danger">Error loading notifications</td></tr>';
+            }
+        }
+
+        async function loadUserTokens() {
+            try {
+                const snap = await get(ref(db, 'users'));
+                const list = document.getElementById('userTokensList');
+                
+                if (!snap.exists()) {
+                    list.innerHTML = '<div class="text-center text-muted py-3">No users found</div>';
+                    return;
+                }
+                
+                let html = '';
+                let tokenCount = 0;
+                let activeCount = 0;
+                
+                snap.forEach(child => {
+                    const user = child.val();
+                    if (user.fcmToken) {
+                        tokenCount++;
+                        activeCount++;
+                        html += `
+                            <div class="token-item">
+                                <div>
+                                    <div class="token-uid">${user.displayName || 'User'} (${child.key.substring(0, 8)}...)</div>
+                                    <small class="text-muted">${user.email || 'No email'}</small>
+                                </div>
+                                <span class="token-status status-active">Active</span>
+                            </div>
+                        `;
+                    } else if (user.notificationEnabled === false) {
+                        html += `
+                            <div class="token-item">
+                                <div>
+                                    <div class="token-uid">${user.displayName || 'User'} (${child.key.substring(0, 8)}...)</div>
+                                    <small class="text-muted">${user.email || 'No email'}</small>
+                                </div>
+                                <span class="token-status status-inactive">Disabled</span>
+                            </div>
+                        `;
+                    }
+                });
+                
+                if (html === '') {
+                    html = '<div class="text-center text-muted py-3">No users with push notifications enabled</div>';
+                } else {
+                    html = `
+                        <div class="alert alert-info py-2 mb-3">
+                            <i class="bi bi-info-circle"></i> ${activeCount} users have push enabled
+                        </div>
+                        ${html}
+                    `;
+                }
+                
+                list.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading user tokens:", error);
+                document.getElementById('userTokensList').innerHTML = 
+                    '<div class="text-center text-danger py-3">Error loading users</div>';
+            }
+        }
+
+        function setupNotificationListeners() {
+            // Update preview
+            document.getElementById('notifTitle')?.addEventListener('input', updatePreview);
+            document.getElementById('notifMessage')?.addEventListener('input', updatePreview);
+            
+            // Show/hide specific user field
+            document.getElementById('notifTarget')?.addEventListener('change', function() {
+                const specificSection = document.getElementById('specificUserSection');
+                specificSection.style.display = this.value === 'specific' ? 'block' : 'none';
+            });
+            
+            // Quick send buttons
+            document.querySelectorAll('[data-quick-title]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('notifTitle').value = this.dataset.quickTitle;
+                    document.getElementById('notifMessage').value = this.dataset.quickMsg;
+                    updatePreview();
+                });
+            });
+            
+            // Test button
+            document.getElementById('testNotifBtn')?.addEventListener('click', async function() {
+                await sendNotification(true);
+            });
+            
+            // Form submit
+            document.getElementById('notificationForm')?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await sendNotification(false);
+            });
+        }
+
+        function updatePreview() {
+            const title = document.getElementById('notifTitle')?.value || 'Notification Title';
+            const message = document.getElementById('notifMessage')?.value || 'Notification message will appear here';
+            
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewMessage').textContent = message;
+        }
+
+        async function sendNotification(isTest = false) {
+            showLoader(true);
+            
+            try {
+                const title = document.getElementById('notifTitle').value;
+                const message = document.getElementById('notifMessage').value;
+                const target = document.getElementById('notifTarget').value;
+                const specificUid = document.getElementById('specificUserId')?.value;
+                const icon = document.getElementById('notifIcon')?.value;
+                const image = document.getElementById('notifImage')?.value;
+                const url = document.getElementById('notifUrl')?.value || 'https://hsytesports.in';
+                const tag = document.getElementById('notifTag')?.value || 'hsyt-notification';
+                
+                if (!title || !message) {
+                    showStatus('Please fill title and message', 'danger');
+                    showLoader(false);
+                    return;
+                }
+                
+                if (target === 'specific' && !specificUid) {
+                    showStatus('Please enter user UID for specific notification', 'danger');
+                    showLoader(false);
+                    return;
+                }
+                
+                // Get FCM Server Key
+                const serverKeySnap = await get(ref(db, 'settings/fcmServerKey'));
+                const serverKey = serverKeySnap.val();
+                
+                if (!serverKey) {
+                    showStatus('Please configure FCM Server Key first in FCM Settings', 'danger');
+                    showLoader(false);
+                    return;
+                }
+                
+                // Get user tokens based on target
+                let tokens = [];
+                if (target === 'all') {
+                    const usersSnap = await get(ref(db, 'users'));
+                    if (usersSnap.exists()) {
+                        usersSnap.forEach(child => {
+                            const user = child.val();
+                            if (user.fcmToken && user.notificationEnabled !== false) {
+                                tokens.push(user.fcmToken);
+                            }
+                        });
+                    }
+                } else if (target === 'specific') {
+                    const userSnap = await get(ref(db, `users/${specificUid}`));
+                    if (userSnap.exists() && userSnap.val().fcmToken && userSnap.val().notificationEnabled !== false) {
+                        tokens.push(userSnap.val().fcmToken);
+                    }
+                } else if (target === 'players') {
+                    const usersSnap = await get(ref(db, 'users'));
+                    if (usersSnap.exists()) {
+                        usersSnap.forEach(child => {
+                            const user = child.val();
+                            if (user.fcmToken && user.notificationEnabled !== false && 
+                                (user.matchesPlayed || 0) > 0) {
+                                tokens.push(user.fcmToken);
+                            }
+                        });
+                    }
+                }
+                
+                if (tokens.length === 0) {
+                    showStatus('No users found with push notifications enabled', 'warning');
+                    showLoader(false);
+                    return;
+                }
+                
+                // Save notification to database
+                const notificationData = {
+                    title: title,
+                    body: message,
+                    icon: icon || '',
+                    image: image || '',
+                    url: url,
+                    tag: tag,
+                    target: target,
+                    specificUid: target === 'specific' ? specificUid : '',
+                    isTest: isTest,
+                    sentBy: auth.currentUser?.uid || 'admin',
+                    timestamp: Date.now(),
+                    status: 'sent',
+                    tokensSent: tokens.length
+                };
+                
+                // Store in database
+                await push(ref(db, 'notifications'), notificationData);
+                
+                // Send to each token
+                let successCount = 0;
+                let failCount = 0;
+                
+                for (const token of tokens) {
+                    try {
+                        await sendFCMNotification(token, {
+                            title,
+                            body: message,
+                            icon: icon || 'https://via.placeholder.com/192/4F46E5/FFFFFF?text=HSYT',
+                            image,
+                            click_action: url,
+                            tag
+                        }, serverKey);
+                        successCount++;
+                    } catch (error) {
+                        console.error('Failed to send to token:', error);
+                        failCount++;
+                    }
+                }
+                
+                // Update notification with results
+                await update(ref(db, `notifications/${notificationRef.key}`), {
+                    successCount,
+                    failCount,
+                    completedAt: Date.now()
+                });
+                
+                // Reset form if not test
+                if (!isTest) {
+                    document.getElementById('notificationForm').reset();
+                    document.getElementById('specificUserSection').style.display = 'none';
+                    document.getElementById('notifUrl').value = 'https://hsytesports.in';
+                    document.getElementById('notifTag').value = 'hsyt-notification';
+                }
+                
+                showStatus(isTest ? `Test notification sent to ${successCount} users!` : `Notification sent successfully to ${successCount} users! (${failCount} failed)`);
+                
+                // Reload lists
+                loadSentNotifications();
+                loadUserTokens();
+                
+            } catch (error) {
+                console.error("Error sending notification:", error);
+                showStatus('Error: ' + error.message, 'danger');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function sendFCMNotification(token, data, serverKey) {
+            const payload = {
+                to: token,
+                notification: {
+                    title: data.title,
+                    body: data.body,
+                    icon: data.icon,
+                    image: data.image,
+                    click_action: data.click_action,
+                    tag: data.tag
+                },
+                webpush: {
+                    fcm_options: {
+                        link: data.click_action
+                    }
+                }
+            };
+            
+            const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `key=${serverKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok || result.failure) {
+                throw new Error(result.results?.[0]?.error || 'FCM send failed');
+            }
+            
+            return result;
+        }
+
+        async function renderStaticPane(paneId, container) {
+            try {
+                if (paneId === 'manageMatches') {
+                    const [games, matches] = await Promise.all([
+                        get(ref(db, 'games')), 
+                        get(ref(db, 'tournaments'))
+                    ]);
+                    
+                    let cats = '';
+                    if(games.exists()) {
+                        Object.entries(games.val()).forEach(([k, v]) => {
+                            cats += `<option value="${k}">${v.name}</option>`;
+                        });
+                    }
+                    
+                    let rows = '';
+                    if(matches.exists()) {
+                        Object.entries(matches.val()).forEach(([k, v]) => {
+                            rows += `<tr>
+                                <td>
+                                    <small>${v.status || 'upcoming'}</small><br>
+                                    <strong>${v.name || 'No Name'}</strong>
+                                </td>
+                                <td>${v.entryFee || 0} / ${v.prizePool || 0}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary manage-match-btn" data-id="${k}">Manage</button>
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-type="tournaments" data-id="${k}">Del</button>
+                                </td>
+                            </tr>`;
+                        });
+                    }
+
+                    container.innerHTML = `
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Add Match</h5>
+                                <form id="addMatchForm">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label>Category</label>
+                                            <select name="gameId" class="form-select" required>
+                                                <option value="">Select Category</option>
+                                                ${cats}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Name</label>
+                                            <input name="name" class="form-control" required placeholder="Match Name">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Fee</label>
+                                            <input type="number" name="entryFee" class="form-control" required placeholder="0">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Prize</label>
+                                            <input type="number" name="prizePool" class="form-control" required placeholder="0">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Per Kill</label>
+                                            <input type="number" name="perKill" class="form-control" required placeholder="0">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Slots</label>
+                                            <input type="number" name="totalSlots" class="form-control" value="48" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Date</label>
+                                            <input type="date" name="matchDate" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Time</label>
+                                            <input type="time" name="matchTime" class="form-control" required>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <label>Match Rules</label>
+                                            <div class="btn-group w-100 mb-1">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="wrapColor('#FF4444')">Red</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success" onclick="wrapColor('#00C851')">Green</button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning" onclick="wrapColor('#FFBB33')">Yellow</button>
+                                                <button type="button" class="btn btn-sm btn-outline-info" onclick="wrapColor('#33B5E5')">Blue</button>
+                                            </div>
+                                            <textarea name="rules" id="rulesInput" class="form-control" rows="5" placeholder="Enter rules here..."></textarea>
+                                            <small class="text-muted">Select text and click a color button.</small>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label>Banner</label>
+                                            <input type="file" name="bannerImage" class="form-control" accept="image/*">
+                                            <div class="upload-status text-muted small"></div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3">Create Match</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Match</th>
+                                            <th>Fee/Prize</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                        </div>`;
+                    
+                    setupMatchForm();
+                    
+                    document.querySelectorAll('.manage-match-btn').forEach(btn => {
+                        btn.addEventListener('click', () => openMatchManager(btn.dataset.id));
+                    });
+
+                } else if (paneId === 'manageCategories') {
+                    const snap = await get(ref(db, 'games'));
+                    let rows = '';
+                    if(snap.exists()) {
+                        Object.entries(snap.val()).forEach(([k,v]) => {
+                            rows += `<tr>
+                                <td>${v.name || 'No Name'}</td>
+                                <td><img src="${v.imageUrl || ''}" alt="${v.name}" style="width:50px;height:50px;object-fit:cover;border-radius:0.5rem;"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-type="games" data-id="${k}">Del</button>
+                                </td>
+                            </tr>`;
+                        });
+                    }
+                    
+                    container.innerHTML = `
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5>Add Category</h5>
+                                <form id="addCatForm">
+                                    <div class="mb-2">
+                                        <input name="name" class="form-control" placeholder="Name" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="file" name="image" class="form-control" accept="image/*" required>
+                                        <div class="upload-status"></div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Img</th>
+                                        <th>Act</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>`;
+                    
+                    setupSimpleForm('addCatForm', 'games');
+                    
+                } else if (paneId === 'manageSliders') {
+                    const snap = await get(ref(db, 'promotions'));
+                    let rows = '';
+                    if(snap.exists()) {
+                        Object.entries(snap.val()).forEach(([k,v]) => {
+                            rows += `<tr>
+                                <td><img src="${v.imageUrl || ''}" alt="Slider" style="width:100px;height:60px;object-fit:cover;border-radius:0.5rem;"></td>
+                                <td>${v.link ? `<a href="${v.link}" target="_blank">${v.link.substring(0,30)}...</a>` : 'No Link'}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary edit-slider-btn" data-id="${k}" data-img="${v.imageUrl || ''}" data-link="${v.link || ''}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-type="promotions" data-id="${k}">Del</button>
+                                </td>
+                            </tr>`;
+                        });
+                    }
+                    
+                    container.innerHTML = `
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5>Add Slider</h5>
+                                <form id="addSlideForm">
+                                    <div class="mb-2">
+                                        <input name="link" class="form-control" placeholder="Link (Optional)">
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="file" name="image" class="form-control" accept="image/*" required>
+                                        <div class="upload-status"></div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Link</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>`;
+                    
+                    setupSimpleForm('addSlideForm', 'promotions');
+                    
+                    document.querySelectorAll('.edit-slider-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const id = btn.dataset.id;
+                            const img = btn.dataset.img;
+                            const link = btn.dataset.link;
+                            
+                            document.getElementById('editSliderId').value = id;
+                            document.getElementById('editSliderImage').value = img;
+                            document.getElementById('editSliderLink').value = link || '';
+                            document.getElementById('editSliderModal').style.display = 'flex';
+                        });
+                    });
+                    
+                } else if (paneId === 'manageLogo') {
+                    const snap = await get(ref(db, 'settings/userAppLogoUrl'));
+                    const currentLogo = snap.val() || '';
+                    
+                    container.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">App Logo Settings</h5>
+                                <form id="logoForm">
+                                    <div class="mb-3">
+                                        <label>Logo Image URL</label>
+                                        <input type="url" name="logoUrl" class="form-control" value="${currentLogo}" placeholder="https://example.com/logo.png" required>
+                                        <small class="text-muted">Enter direct image URL (PNG, JPG, SVG recommended)</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Preview</label>
+                                        <div class="border p-3 text-center" style="background: #f8f9fa; border-radius: 8px;">
+                                            <img id="logoPreview" src="${currentLogo || 'https://via.placeholder.com/150x50/4F46E5/ffffff?text=LOGO'}" 
+                                                 style="max-width: 200px; max-height: 80px; object-fit: contain;" 
+                                                 onerror="this.src='https://via.placeholder.com/150x50/4F46E5/ffffff?text=LOGO'">
+                                            <div class="mt-2 text-muted small">Logo will appear in User App</div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Logo</button>
+                                </form>
+                            </div>
+                        </div>`;
+                    
+                    document.getElementById('logoForm').addEventListener('submit', async e => {
+                        e.preventDefault();
+                        showLoader(true);
+                        try {
+                            const logoUrl = e.target.logoUrl.value.trim();
+                            await set(ref(db, 'settings/userAppLogoUrl'), logoUrl);
+                            showStatus('Logo Saved Successfully');
+                            document.getElementById('logoPreview').src = logoUrl;
+                        } catch (error) {
+                            showStatus('Error saving logo: ' + error.message, 'danger');
+                        } finally {
+                            showLoader(false);
+                        }
+                    });
+                    
+                } else if (paneId === 'managePrivacy') {
+                    const snap = await get(ref(db, 'settings/privacyPolicy'));
+                    container.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Privacy Policy</h5>
+                                <form id="privacyForm">
+                                    <textarea name="content" class="form-control mb-3" rows="10">${snap.val() || ''}</textarea>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </form>
+                            </div>
+                        </div>`;
+                    
+                    document.getElementById('privacyForm').addEventListener('submit', async e => {
+                        e.preventDefault(); 
+                        showLoader(true);
+                        try {
+                            await set(ref(db, 'settings/privacyPolicy'), e.target.content.value);
+                            showStatus('Privacy Policy Saved');
+                        } catch (error) {
+                            showStatus('Error saving: ' + error.message, 'danger');
+                        } finally {
+                            showLoader(false);
+                        }
+                    });
+                    
+                } else if (paneId === 'manageAnnouncement') {
+                    const snap = await get(ref(db, 'settings/announcement'));
+                    container.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-megaphone-fill"></i> AI Announcement
+                                </h5>
+                                <p class="text-muted small">
+                                    This message will be shown when users ask the AI for "News" or "Updates".
+                                </p>
+                                <form id="announcementForm">
+                                    <textarea name="text" class="form-control mb-3" rows="4" 
+                                        placeholder="Enter announcement here...">${snap.val() || ''}</textarea>
+                                    <button type="submit" class="btn btn-primary">Publish</button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="clearAnnounce()">Clear</button>
+                                </form>
+                            </div>
+                        </div>`;
+                    
+                    document.getElementById('announcementForm').addEventListener('submit', async e => {
+                        e.preventDefault(); 
+                        showLoader(true);
+                        try {
+                            await set(ref(db, 'settings/announcement'), e.target.text.value);
+                            showStatus('Announcement Published');
+                        } catch (error) {
+                            showStatus('Error publishing: ' + error.message, 'danger');
+                        } finally {
+                            showLoader(false);
+                        }
+                    });
+                    
+                    window.clearAnnounce = async () => {
+                        if(confirm("Clear announcement?")) {
+                            showLoader(true);
+                            try {
+                                await set(ref(db, 'settings/announcement'), "");
+                                document.querySelector('#announcementForm textarea').value = "";
+                                showStatus('Announcement Cleared');
+                            } catch (error) {
+                                showStatus('Error clearing: ' + error.message, 'danger');
+                            } finally {
+                                showLoader(false);
+                            }
+                        }
+                    };
+                }
+                
+                attachActionListeners();
+            } catch (error) {
+                console.error("Error rendering pane:", error);
+                container.innerHTML = `<div class="alert alert-danger">Error loading ${paneId}: ${error.message}</div>`;
+            }
+        }
+        
+        async function openMatchManager(matchId) {
+            showLoader(true);
+            try {
+                const modal = document.getElementById('matchManagerModal');
+                document.getElementById('mmMatchId').value = matchId;
+                
+                const snap = await get(ref(db, `tournaments/${matchId}`));
+                if (!snap.exists()) {
+                    showStatus('Match not found', 'danger');
+                    showLoader(false);
+                    return;
+                }
+                
+                const data = snap.val();
+                
+                document.getElementById('mmStatusSelect').value = data.status || 'upcoming';
+                document.getElementById('mmRoomId').value = data.roomId || '';
+                document.getElementById('mmPass').value = data.roomPass || '';
+                
+                const pList = document.getElementById('mmParticipantsList');
+                pList.innerHTML = '';
+                let joinedCount = 0;
+                
+                if (data.participants) {
+                    Object.values(data.participants).forEach(p => {
+                        if (p) {
+                            pList.innerHTML += `
+                                <div class="p-item">
+                                    <span>Slot #${p.slot || '?'} - ${p.inGameName || 'Unknown'}</span>
+                                    <small>${p.userId ? `UID: ${p.userId.substring(0, 8)}...` : ''}</small>
+                                </div>`;
+                            joinedCount++;
+                        }
+                    });
+                }
+                
+                if (joinedCount === 0) {
+                    pList.innerHTML = '<div class="text-muted p-2">No participants yet.</div>';
+                }
+                
+                document.getElementById('mmJoinedCount').innerText = joinedCount;
+                
+                await renderResultsTable(matchId);
+                
+                showLoader(false);
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error("Error opening match manager:", error);
+                showStatus('Error loading match: ' + error.message, 'danger');
+                showLoader(false);
+            }
+        }
+
+        async function renderResultsTable(matchId) {
+            const table = document.getElementById('mmResultsTable');
+            table.innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border spinner-border-sm"></div></td></tr>';
+            
+            try {
+                const snap = await get(ref(db, `tournaments/${matchId}/results`));
+                table.innerHTML = '';
+                
+                if (snap.exists()) {
+                    const results = snap.val();
+                    let resultsArray = [];
+                    
+                    Object.entries(results).forEach(([key, r]) => {
+                        if (r) {
+                            resultsArray.push({ key, ...r });
+                        }
+                    });
+                    
+                    resultsArray.sort((a, b) => (a.rank || 999) - (b.rank || 999));
+                    
+                    resultsArray.forEach((r, index) => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>#${r.rank || index + 1}</td>
+                                <td>${r.name || 'Unknown'}</td>
+                                <td>${r.kills || 0}</td>
+                                <td>₹${r.win || 0}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteResult('${matchId}', '${r.key}')">x</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    table.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No results published yet.</td></tr>';
+                }
+            } catch (error) {
+                console.error("Error rendering results:", error);
+                table.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading results</td></tr>';
+            }
+        }
+        
+        window.deleteResult = async (matchId, resultKey) => {
+            if(confirm('Remove this result entry?')) {
+                showLoader(true);
+                try {
+                    await remove(ref(db, `tournaments/${matchId}/results/${resultKey}`));
+                    await renderResultsTable(matchId);
+                    showStatus('Result deleted');
+                } catch (error) {
+                    showStatus('Error deleting: ' + error.message, 'danger');
+                } finally {
+                    showLoader(false);
+                }
+            }
+        };
+
+        document.querySelectorAll('#matchTabs .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('#matchTabs .nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.mm-tab-pane').forEach(p => p.style.display = 'none');
+                
+                link.classList.add('active');
+                const tabId = link.dataset.tab;
+                const tabElement = document.getElementById(tabId);
+                if (tabElement) {
+                    tabElement.style.display = 'block';
+                }
+            });
+        });
+
+        document.getElementById('btnSaveRoomInfo').addEventListener('click', async () => {
+            const id = document.getElementById('mmMatchId').value;
+            const status = document.getElementById('mmStatusSelect').value;
+            const rid = document.getElementById('mmRoomId').value;
+            const pass = document.getElementById('mmPass').value;
+            
+            if (!id) {
+                showStatus('No match selected', 'danger');
+                return;
+            }
+            
+            showLoader(true);
+            try {
+                await update(ref(db, `tournaments/${id}`), {
+                    status: status,
+                    roomId: rid,
+                    roomPass: pass
+                });
+                showStatus('Match Info Updated');
+                
+                renderStaticPane('manageMatches', document.getElementById('managementPanesContainer'));
+            } catch (error) {
+                showStatus('Error updating: ' + error.message, 'danger');
+            } finally {
+                showLoader(false);
+            }
+        });
+
+        document.getElementById('addResultForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            
+            const id = document.getElementById('mmMatchId').value;
+            const name = document.getElementById('resPlayerName').value.trim();
+            const rank = Number(document.getElementById('resRank').value);
+            const kills = Number(document.getElementById('resKills').value);
+            const win = Number(document.getElementById('resWin').value);
+            
+            if (!id || !name || !rank) {
+                showStatus('Please fill all required fields', 'danger');
+                return;
+            }
+            
+            showLoader(true);
+            try {
+                const newRef = push(ref(db, `tournaments/${id}/results`));
+                await set(newRef, {
+                    name: name, 
+                    rank: rank, 
+                    kills: kills, 
+                    win: win
+                });
+                
+                e.target.reset();
+                showStatus('Result added');
+                await renderResultsTable(id);
+            } catch (error) {
+                showStatus('Error adding result: ' + error.message, 'danger');
+            } finally {
+                showLoader(false);
+            }
+        });
+
+        document.getElementById('editSliderForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            showLoader(true);
+            try {
+                const sliderId = document.getElementById('editSliderId').value;
+                const imageUrl = document.getElementById('editSliderImage').value;
+                const link = document.getElementById('editSliderLink').value;
+                
+                await update(ref(db, `promotions/${sliderId}`), {
+                    imageUrl: imageUrl,
+                    link: link || ''
+                });
+                
+                showStatus('Slider Updated');
+                closeModal('editSliderModal');
+                
+                const active = document.querySelector('.control-menu .active');
+                if (active && active.dataset.pane === 'manageSliders') {
+                    renderStaticPane('manageSliders', document.getElementById('managementPanesContainer'));
+                }
+            } catch (error) {
+                showStatus('Error updating slider: ' + error.message, 'danger');
+            } finally {
+                showLoader(false);
+            }
+        });
+
+        window.wrapColor = (color) => {
+            const textarea = document.getElementById('rulesInput');
+            if (!textarea) return;
+            
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            if (start === end) {
+                alert("Please select specific text to color first!");
+                return;
+            }
+            
+            const selectedText = text.substring(start, end);
+            const coloredText = `<span style="color:${color}; font-weight:bold;">${selectedText}</span>`;
+            textarea.value = text.substring(0, start) + coloredText + text.substring(end);
+            
+            textarea.focus();
+            textarea.setSelectionRange(start + coloredText.length, start + coloredText.length);
+        };
+
+        function attachActionListeners() {
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const { action, id, uid, amt } = e.target.dataset;
+                    if(!confirm(`Confirm ${action}?`)) return;
+                    showLoader(true);
+                    try {
+                        if(action === 'approveDeposit') {
+                            const amount = parseFloat(amt);
+                            await update(ref(db, `deposits/${id}`), { status: 'approved' });
+                            await runTransaction(ref(db, `users/${uid}/balance`), (b) => (b || 0) + amount);
+                            showStatus("Approved & Credited");
+                        } else if(action === 'rejectDeposit') {
+                            await update(ref(db, `deposits/${id}`), { status: 'rejected' });
+                            showStatus("Rejected");
+                        } else if(action === 'approveWithdrawal') {
+                            await update(ref(db, `withdrawals/${id}`), { status: 'approved' });
+                            showStatus("Marked Paid");
+                        } else if(action === 'rejectWithdrawal') {
+                            const amount = parseFloat(amt);
+                            await update(ref(db, `withdrawals/${id}`), { status: 'rejected' });
+                            await runTransaction(ref(db, `users/${uid}/balance`), (b) => (b || 0) + amount);
+                            showStatus("Rejected & Refunded");
+                        }
+                    } catch(err) { 
+                        console.error("Action error:", err);
+                        showStatus(err.message, 'danger'); 
+                    }
+                    finally { 
+                        showLoader(false); 
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async e => {
+                    if(confirm("Delete item?")) {
+                        showLoader(true);
+                        try {
+                            await remove(ref(db, `${e.target.dataset.type}/${e.target.dataset.id}`));
+                            showStatus('Deleted');
+                            
+                            if(!dbListeners.pane) {
+                                const active = document.querySelector('.control-menu .active');
+                                if (active) {
+                                    const paneId = active.dataset.pane;
+                                    renderStaticPane(paneId, document.getElementById('managementPanesContainer'));
+                                }
+                            }
+                        } catch (error) {
+                            showStatus('Error deleting: ' + error.message, 'danger');
+                        } finally {
+                            showLoader(false);
+                        }
+                    }
+                });
+            });
+        }
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async e => {
+            e.preventDefault(); 
+            showLoader(true);
+            try { 
+                await signInWithEmailAndPassword(
+                    auth, 
+                    e.target.adminEmail.value, 
+                    e.target.adminPassword.value
+                ); 
+            } catch (err) { 
+                console.error("Login error:", err);
+                document.getElementById('adminLoginStatus').innerHTML = `
+                    <div class="alert alert-danger">Login failed: ${err.message}</div>`; 
+            } finally { 
+                showLoader(false); 
+            }
+        });
+
+        document.getElementById('adminSetupForm').addEventListener('submit', async e => {
+            e.preventDefault(); 
+            showLoader(true);
+            try {
+                const cred = await createUserWithEmailAndPassword(
+                    auth, 
+                    e.target.setupEmail.value, 
+                    e.target.setupPassword.value
+                );
+                await set(ref(db, 'adminConfig'), { 
+                    setupComplete: true, 
+                    adminUid: cred.user.uid 
+                });
+                await signOut(auth); 
+                location.reload();
+            } catch (err) { 
+                console.error("Setup error:", err);
+                document.getElementById('adminSetupStatus').innerHTML = `
+                    <div class="alert alert-danger">${err.message}</div>`; 
+            } finally { 
+                showLoader(false); 
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).catch(error => {
+                console.error("Logout error:", error);
+            });
+        });
+
+        document.getElementById('editUserForm').addEventListener('submit', async e => {
+            e.preventDefault(); 
+            showLoader(true);
+            const uid = document.getElementById('editUserId').value;
+            const newName = document.getElementById('editUserName').value;
+            const newBal = parseFloat(document.getElementById('editUserBalance').value);
+            
+            try {
+                await update(ref(db, `users/${uid}`), { 
+                    displayName: newName, 
+                    balance: newBal 
+                });
+                showStatus('User Updated');
+                document.getElementById('editUserModal').style.display = 'none';
+            } catch(err) { 
+                showStatus(err.message, 'danger'); 
+            } finally { 
+                showLoader(false); 
+            }
+        });
+
+        async function uploadImg(file, statusEl) {
+            if (!file || !file.type.startsWith('image/')) {
+                throw new Error('Please select a valid image file');
+            }
+            
+            statusEl.innerText = 'Uploading...';
+            try {
+                const fd = new FormData(); 
+                fd.append('image', file);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST', 
+                    body: fd
+                });
+                const json = await res.json();
+                if(!json.success) throw new Error(json.error?.message || 'Upload failed');
+                statusEl.innerText = 'Done';
+                return json.data.url;
+            } catch (error) {
+                statusEl.innerText = 'Upload failed';
+                throw error;
+            }
+        }
+
+        function setupSimpleForm(formId, path) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+            
+            form.addEventListener('submit', async e => {
+                e.preventDefault(); 
+                showLoader(true);
+                try {
+                    const data = Object.fromEntries(new FormData(e.target));
+                    const fileInput = e.target.querySelector('input[type="file"]');
+                    
+                    if (fileInput && fileInput.files[0]) {
+                        const statusEl = e.target.querySelector('.upload-status');
+                        data.imageUrl = await uploadImg(fileInput.files[0], statusEl);
+                    }
+                    
+                    delete data.image;
+                    await push(ref(db, path), data);
+                    showStatus('Added'); 
+                    
+                    const active = document.querySelector('.control-menu .active');
+                    if (active) {
+                        renderStaticPane(active.dataset.pane, document.getElementById('managementPanesContainer'));
+                    }
+                } catch(err) { 
+                    console.error("Form error:", err);
+                    showStatus(err.message, 'danger'); 
+                } finally { 
+                    showLoader(false); 
+                }
+            });
+        }
+
+        function setupMatchForm() {
+            const form = document.getElementById('addMatchForm');
+            if (!form) return;
+            
+            form.addEventListener('submit', async e => {
+                e.preventDefault(); 
+                showLoader(true);
+                try {
+                    const data = Object.fromEntries(new FormData(e.target));
+                    const fileInput = e.target.querySelector('input[name="bannerImage"]');
+                    
+                    if (fileInput && fileInput.files[0]) {
+                        const statusEl = e.target.querySelector('.upload-status');
+                        data.bannerUrl = await uploadImg(fileInput.files[0], statusEl);
+                    }
+                    
+                    delete data.bannerImage;
+                    
+                    data.entryFee = Number(data.entryFee) || 0;
+                    data.prizePool = Number(data.prizePool) || 0;
+                    data.perKill = Number(data.perKill) || 0;
+                    data.totalSlots = Number(data.totalSlots) || 48;
+                    data.filledSlots = 0;
+                    data.status = 'upcoming';
+                    data.createdAt = serverTimestamp();
+                    
+                    await push(ref(db, 'tournaments'), data);
+                    showStatus('Match Created'); 
+                    renderStaticPane('manageMatches', document.getElementById('managementPanesContainer'));
+                } catch(err) { 
+                    console.error("Match form error:", err);
+                    showStatus(err.message, 'danger'); 
+                } finally { 
+                    showLoader(false); 
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!app) {
+                document.getElementById('auth-container').innerHTML = `
+                    <div class="container login-container">
+                        <div class="alert alert-danger">
+                            Firebase initialization failed. Please check console for errors.
+                        </div>
+                    </div>`;
+            }
+        });
+    </script>
+</body>
+</html>
