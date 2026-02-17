@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>𝐁𝐃 𝐂𝐀𝐒𝐇𝐃𝐑𝐎𝐏 𝐁𝐎𝐓</title>
+    
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Monetag Ad Script -->
+    <script src='//libtl.com/sdk.js' data-zone='10075117' data-sdk='show_10075117'></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        primary: '#6366f1', // Default Purple
+                        secondary: '#a855f7',
+                        success: '#22c55e',
+                        glass: 'rgba(255, 255, 255, 0.05)',
+                        gold: '#fbbf24',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base Styles */
+        body {
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.5s ease;
+        }
+
+        /* Green UI Theme Override */
+        body.theme-green {
+            background: radial-gradient(circle at top left, #064e3b, #022c22) !important;
+        }
+        body.theme-green .text-primary { color: #4ade80 !important; }
+        body.theme-green .bg-primary { background-color: #22c55e !important; }
+        body.theme-green .border-primary { border-color: #22c55e !important; }
+        body.theme-green .btn-gradient {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3) !important;
+        }
+        body.theme-green .nav-btn.active { color: #4ade80 !important; }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .nav-glass {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* Buttons & Interactions */
+        .btn-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: transform 0.1s;
+        }
+        .btn-gradient:active { transform: scale(0.96); }
+        
+        ::-webkit-scrollbar { display: none; }
+        
+        /* Animations */
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .level-badge {
+            background: linear-gradient(90deg, #fbbf24, #d97706);
+            color: #000;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+        
+        .ripple { position: relative; overflow: hidden; transform: translate3d(0, 0, 0); }
+        .ripple:after { content: ""; display: block; position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; background-image: radial-gradient(circle, #fff 10%, transparent 10.01%); background-repeat: no-repeat; background-position: 50%; transform: scale(10, 10); opacity: 0; transition: transform .5s, opacity 1s; }
+        .ripple:active:after { transform: scale(0, 0); opacity: .2; transition: 0s; }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+        .animate-marquee {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+        .marquee-container:hover .animate-marquee { animation-play-state: paused; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* Verify Badge Pulse */
+        .verify-pulse { animation: verifyPulse 2s infinite; }
+        @keyframes verifyPulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+/* --- MODERN LEADERBOARD STYLES --- */
+.leaderboard-overlay {
+    background: radial-gradient(circle at top center, #2e1065, #0f172a); /* Deep Purple to Dark */
+    backdrop-filter: blur(20px);
+}
+
+/* Avatar Polygon Shape */
+.poly-shape {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); /* Hexagon Style */
+    padding: 2px;
+    background: linear-gradient(45deg, #fbbf24, #d97706); /* Gold Gradient Border */
+    transition: transform 0.3s;
+}
+.poly-shape img {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Rank Glows */
+.glow-1 { box-shadow: 0 0 25px rgba(251, 191, 36, 0.4); } /* Gold */
+.glow-2 { box-shadow: 0 0 20px rgba(148, 163, 184, 0.3); } /* Silver */
+.glow-3 { box-shadow: 0 0 20px rgba(180, 83, 9, 0.3); }   /* Bronze */
+
+/* Custom Scrollbar for list */
+.hide-scroll::-webkit-scrollbar { display: none; }
+
+/* Sticky Footer styling */
+.rank-footer {
+    background: rgba(15, 23, 42, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+}
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden select-none text-sm md:text-base">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-50 bg-[#0f172a] flex flex-col items-center justify-center overflow-hidden transition-opacity duration-500">
+        <div class="absolute w-80 h-80 bg-primary/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="relative z-10 flex flex-col items-center">
+            <div class="relative w-24 h-24 mb-8">
+                <div class="absolute inset-0 border-4 border-slate-700/30 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <!-- 👇👇👇 এই অংশটুকু পরিবর্তন করুন 👇👇👇 -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <!-- এখানে আপনার বটের ছবির লিংক দিন -->
+                    <img src="https://i.ibb.co/tPqT6q8W/20260129-234643.png" class="w-14 h-14 animate-pulse drop-shadow-lg object-contain">
+                </div>
+                <!-- 👆👆👆 পরিবর্তন শেষ 👆👆👆 -->
+                </div>
+            </div>
+            <h2 class="text-white font-bold text-2xl tracking-wider drop-shadow-lg mb-2">EARNWAY</h2>
+            <div class="flex items-center gap-2 text-slate-400 text-xs font-mono tracking-widest uppercase">
+                <span>Monetize Your Time</span>
+                <span class="flex gap-1">
+                    <span class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce delay-75"></span>
+                    <span class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce delay-150"></span>
+                    <span class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce delay-300"></span>
+                </span>
+            </div>
+        </div>
+        <div class="absolute bottom-10 text-slate-600 text-[10px] flex items-center gap-2">
+            <i class="fas fa-shield-alt"></i>
+            <span>Thanks For Tanjid Islam</span>
+        </div>
+    </div>
+
+    <!-- Verification Modal -->
+    <div id="verify-modal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm rounded-2xl p-6 relative animate__animated animate__zoomIn">
+            <button onclick="closeVerifyModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3 verify-pulse">
+                    <i class="fas fa-crown text-yellow-400 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Verify Account</h3>
+                <p class="text-xs text-gray-400 mt-2">To withdraw funds, you must verify your account.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-white/5 p-3 rounded-lg border border-white/10">
+                    <p class="text-xs text-gray-400 mb-1">Verify Fee</p>
+                    <p class="text-lg font-bold text-primary"><span id="verify-fee-display">0</span> BDT</p>
+                </div>
+                
+                <div class="text-xs text-gray-300 bg-blue-500/10 p-3 rounded-lg border border-blue-500/20">
+                    <i class="fas fa-info-circle mr-1"></i> Send money to: <span id="admin-number" class="font-mono font-bold select-all text-blue-400">Loading...</span>
+                    <br>(<span id="payment-method-name">Bkash (BKash Only)</span>)
+                </div>
+
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Transaction ID</label>
+                    <input type="text" id="verify-trx" class="w-full bg-slate-900 border border-white/10 rounded-lg p-3 focus:border-primary outline-none transition" placeholder="Ex: 8JHS7ySD...">
+                </div>
+
+                <button onclick="submitVerification()" class="w-full btn-gradient py-3 rounded-xl font-bold text-white shadow-lg">Submit for Review</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto pb-24 px-4 pt-6 scroll-smooth">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <img id="user-avatar" src="" class="w-12 h-12 rounded-full border-2 border-primary/50 shadow-lg object-cover">
+                    <div id="status-indicator" class="absolute bottom-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-900"></div>
+                </div>
+                <div>
+                    <h2 id="user-name" class="font-bold text-lg leading-tight truncate w-32">Loading...</h2>
+                    <div class="flex items-center gap-1">
+                        <span id="user-level" class="text-xs text-secondary font-semibold">Guest</span>
+                        <i id="verified-badge" class="fas fa-check-circle text-[10px] text-gray-500" title="Not Verified"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-card px-4 py-2 rounded-full flex items-center gap-2 border-primary/30">
+                <i class="fas fa-wallet text-secondary"></i>
+                <span id="header-balance" class="font-bold text-white">0.00</span> 
+                <span class="text-xs text-gray-400">BDT</span>
+            </div>
+        </div>
+
+        <!-- HOME SECTION -->
+        <div id="home-section" class="tab-content active">
+            <!-- Balance Card -->
+            <div class="glass-card rounded-2xl p-6 mb-6 relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition duration-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Total Balance</p>
+                        <h1 class="text-4xl font-bold mb-4 tracking-tight">৳ <span id="main-balance">0.00</span></h1>
+                    </div>
+                    <div onclick="openVerifyModal()" id="verify-btn-card" class="bg-white/10 p-2 rounded-lg cursor-pointer hover:bg-white/20 transition hidden">
+                         <i class="fas fa-shield-alt text-yellow-400 text-xl animate-pulse"></i>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button onclick="switchTab('earn')" class="ripple flex-1 btn-gradient py-2.5 rounded-xl font-medium text-sm text-white flex items-center justify-center gap-2">
+                        <i class="fas fa-coins"></i> Earn
+                    </button>
+                    <button onclick="switchTab('wallet')" class="ripple flex-1 glass-card py-2.5 rounded-xl font-medium text-sm hover:bg-white/10 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-university"></i> Withdraw
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="glass-card p-4 rounded-xl text-center transform hover:scale-[1.02] transition duration-200">
+                    <div class="w-10 h-10 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <h3 id="stats-ads" class="font-bold text-xl">0</h3>
+                    <p class="text-xs text-gray-400">Ads Watched</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center transform hover:scale-[1.02] transition duration-200">
+                    <div class="w-10 h-10 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 id="stats-refs" class="font-bold text-xl">0</h3>
+                    <p class="text-xs text-gray-400">Referrals</p>
+                </div>
+            </div>
+            
+            <!-- Notice Board -->
+            <div class="glass-card p-4 rounded-xl relative overflow-hidden mb-6 border-l-4 border-yellow-500">
+                <div class="flex items-center gap-3">
+                    <div class="min-w-[40px] h-[40px] bg-yellow-500/10 rounded-full flex items-center justify-center animate-pulse">
+                        <i class="fas fa-bullhorn text-yellow-400 text-sm"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="font-bold text-yellow-400 text-xs tracking-wide uppercase">Notice Board</h4>
+                            <span class="text-[9px] font-bold bg-yellow-500/20 text-yellow-300 px-1.5 py-0.5 rounded">LIVE</span>
+                        </div>
+                        <div class="marquee-container w-full cursor-pointer" onclick="this.classList.toggle('paused')">
+                            <p id="notice-text" class="text-xs text-gray-300 animate-marquee">
+                                Welcome to Earnway Pro! Complete tasks to earn money. Verification is required for withdrawal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- New Leaderboard Trigger Button -->
+<div onclick="openLeaderboard()" class="ripple relative overflow-hidden glass-card p-0 rounded-2xl mb-6 cursor-pointer group border-0">
+    <div class="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 opacity-90"></div>
+    <div class="relative p-5 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-inner">
+                <i class="fas fa-crown text-yellow-300 text-2xl drop-shadow-md"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-white text-lg">Leaderboard</h3>
+                <p class="text-xs text-indigo-200">Check Top Earners & Your Rank</p>
+            </div>
+        </div>
+        <div class="w-8 h-8 bg-white text-indigo-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition">
+            <i class="fas fa-arrow-right"></i>
+        </div>
+    </div>
+    <!-- Background Patterns -->
+    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+</div>
+            </div>
+        </div>
+
+        <!-- EARN SECTION -->
+        <div id="earn-section" class="tab-content">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-layer-group text-primary"></i> Task Center
+            </h2>
+            
+            <!-- Daily Checkin -->
+            <div class="glass-card p-4 rounded-xl mb-4 flex items-center justify-between border-l-4 border-orange-500">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-orange-400 text-xl">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">Daily Bonus</h3>
+                        <p class="text-xs text-gray-400">Claim your daily reward</p>
+                    </div>
+                </div>
+                <button onclick="dailyCheckIn()" class="ripple bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition">Claim</button>
+            </div>
+
+            <!-- Ad Task -->
+            <div class="glass-card p-4 rounded-xl mb-4 flex items-center justify-between border-l-4 border-red-500">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center text-red-400 text-xl">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">Watch Ad</h3>
+                        <p class="text-xs text-gray-400">Earn <span id="ad-rate">...</span> BDT</p>
+                    </div>
+                </div>
+                <button onclick="watchAd()" class="ripple btn-gradient px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg">Watch</button>
+            </div>
+            
+            <!-- Channel Task -->
+             <div class="glass-card p-4 rounded-xl mb-4 flex items-center justify-between border-l-4 border-blue-400">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-400/20 rounded-xl flex items-center justify-center text-blue-400 text-xl">
+                        <i class="fab fa-telegram-plane"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">Join Channel</h3>
+                        <p class="text-xs text-gray-400">One time reward: 5.00 BDT</p>
+                    </div>
+                </div>
+                <button id="btn-join" onclick="joinChannel()" class="ripple bg-white/10 px-4 py-2 rounded-lg text-sm font-medium transition">Join</button>
+            </div>
+
+            <!-- Professional Link Tasks (Dynamic from Firebase) -->
+            <div class="mt-6">
+                <h3 class="font-bold text-lg mb-3">Sponsored Links</h3>
+                <div id="link-tasks-container" class="space-y-3">
+                    <!-- Links will be injected here -->
+                    <p class="text-center text-xs text-gray-500">Loading tasks...</p>
+                </div>
+            </div>
+        </div>
+
+<!-- LEADERBOARD FULL PAGE OVERLAY -->
+<div id="leaderboard-page" class="fixed inset-0 z-50 leaderboard-overlay overflow-hidden hidden flex flex-col animate__animated animate__fadeIn">
+    
+    <!-- Header Area -->
+    <div class="pt-6 px-4 pb-4 shrink-0 relative z-10">
+        <!-- Top Nav -->
+        <div class="flex items-center justify-between mb-6">
+            <button onclick="closeLeaderboard()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10 hover:bg-white/10 transition">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 uppercase tracking-widest">Leaderboard</h2>
+            <div class="w-10"></div> <!-- Spacer for center alignment -->
+        </div>
+
+        <!-- Segmented Control Tabs -->
+        <div class="glass-card p-1 rounded-xl flex relative mb-2">
+            <div id="tab-indicator" class="absolute left-1 top-1 bottom-1 w-[48%] bg-gradient-to-r from-primary to-secondary rounded-lg transition-all duration-300 shadow-lg"></div>
+            <button onclick="loadLeaderboardData('balance')" class="flex-1 relative z-10 py-2 text-xs font-bold text-white text-center uppercase tracking-wide">Top Earners</button>
+            <button onclick="loadLeaderboardData('ref')" class="flex-1 relative z-10 py-2 text-xs font-bold text-white text-center uppercase tracking-wide">Top Referrers</button>
+        </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto hide-scroll pb-24">
+        
+        <!-- Top 3 Podium -->
+        <div class="flex justify-center items-end gap-3 mt-2 mb-8 px-4 min-h-[180px]" id="top-3-container">
+            <!-- Loading Skeleton -->
+            <div class="flex items-end gap-3 opacity-50">
+                <div class="w-20 h-24 bg-white/5 rounded-t-xl animate-pulse"></div>
+                <div class="w-24 h-32 bg-white/10 rounded-t-xl animate-pulse"></div>
+                <div class="w-20 h-20 bg-white/5 rounded-t-xl animate-pulse"></div>
+            </div>
+        </div>
+
+        <!-- Top 4-50 List -->
+        <div class="px-4 space-y-2.5" id="leaderboard-list-items">
+            <!-- List will be injected here -->
+        </div>
+        
+        <!-- Bottom Spacer -->
+        <div class="h-8"></div>
+    </div>
+
+    <!-- My Rank Sticky Footer -->
+    <div id="my-rank-footer" class="absolute bottom-0 left-0 w-full rank-footer p-4 transform translate-y-full transition-transform duration-300 z-20">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <p class="text-[10px] text-gray-400 uppercase">My Rank</p>
+                    <h4 class="text-xl font-bold text-white" id="my-rank-num">-</h4>
+                </div>
+                <div class="w-10 h-10 rounded-full border border-primary p-0.5">
+                    <img id="my-rank-img" src="" class="w-full h-full rounded-full object-cover">
+                </div>
+                <div>
+                    <p class="font-bold text-sm text-white">You</p>
+                    <p class="text-[10px] text-gray-400" id="my-rank-txt">Not in Top 10</p>
+                </div>
+            </div>
+            <div class="bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/30">
+                <span class="font-bold text-primary" id="my-rank-score">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- WALLET SECTION -->
+        <div id="wallet-section" class="tab-content">
+            <h2 class="text-2xl font-bold mb-4">Withdraw Funds</h2>
+            <div class="glass-card p-6 rounded-2xl mb-6 text-center border border-primary/20 bg-gradient-to-b from-primary/10 to-transparent">
+                <p class="text-gray-400 text-sm">Withdrawable Balance</p>
+                <h1 class="text-4xl font-bold text-white mt-1">৳ <span id="wallet-balance">0.00</span></h1>
+                
+                <div id="verify-warning" class="mt-3 bg-red-500/20 text-red-300 text-xs py-2 rounded-lg hidden">
+                    <i class="fas fa-exclamation-triangle"></i> Account not verified.
+                    <button onclick="openVerifyModal()" class="underline font-bold ml-1">Verify Now</button>
+                </div>
+            </div>
+
+            <form id="withdraw-form" onsubmit="handleWithdraw(event)" class="space-y-4 mb-8">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-2 ml-1">Select Payment Method</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="glass-card p-3 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-primary transition duration-300" onclick="selectMethod(this, 'Bkash')">
+                            <img src="https://i.ibb.co/FLLrLLbg/vecteezy-bkash-logo-mobile-banking-app-icon-transparent-background-68764270.png" class="w-8 h-8 mx-auto mb-2 object-contain">
+                            <span class="text-xs font-semibold">Bkash</span>
+                        </div>
+                        <div class="glass-card p-3 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-primary transition duration-300" onclick="selectMethod(this, 'Nagad')">
+                            <img src="https://i.ibb.co/xqpRNDhs/vecteezy-nagan-logo-mobile-banking-app-icon-transparent-background-68764276.png" class="w-8 h-8 mx-auto mb-2 object-contain">
+                            <span class="text-xs font-semibold">Nagad</span>
+                        </div>
+                        <div class="glass-card p-3 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-primary transition duration-300" onclick="selectMethod(this, 'Rocket')">
+                            <img src="https://i.ibb.co/CKDPBXQm/vecteezy-rocket-icon-mobile-banking-logo-emblem-transparent-background-68842062.png" class="w-8 h-8 mx-auto mb-2 object-contain">
+                            <span class="text-xs font-semibold">Rocket</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="withdraw-method" required>
+                </div>
+
+                <div class="glass-card p-2 rounded-xl flex items-center px-4">
+                    <i class="fas fa-phone-alt text-gray-400 mr-3"></i>
+                    <input type="number" id="withdraw-number" class="w-full bg-transparent border-none text-white focus:outline-none py-2 placeholder-gray-500" placeholder="Wallet Number" required>
+                </div>
+
+                <div class="glass-card p-2 rounded-xl flex items-center px-4">
+                    <i class="fas fa-money-bill-wave text-gray-400 mr-3"></i>
+                    <input type="number" id="withdraw-amount" class="w-full bg-transparent border-none text-white focus:outline-none py-2 placeholder-gray-500" placeholder="Amount (Min: 50)" required>
+                </div>
+
+                <button type="submit" class="ripple w-full btn-gradient py-3.5 rounded-xl font-bold mt-4 shadow-lg shadow-primary/25 flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
+            </form>
+
+            <!-- Transaction History -->
+            <div class="mt-6">
+                <h3 class="font-bold mb-3 text-sm text-gray-300">History</h3>
+                <div id="tx-history" class="space-y-3 pb-4">
+                    <div class="text-center text-xs text-gray-500 py-4">No transactions found</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE SECTION -->
+        <div id="profile-section" class="tab-content">
+            <div class="glass-card p-6 rounded-2xl text-center mb-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+                <div class="relative inline-block">
+                    <img id="profile-avatar-big" src="" class="w-24 h-24 rounded-full border-4 border-white/10 mx-auto shadow-2xl mb-3 object-cover">
+                    <div id="profile-verify-badge" class="absolute bottom-2 right-2 bg-gray-500 w-6 h-6 rounded-full border-2 border-slate-900 flex items-center justify-center text-[10px] text-white">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+                <h2 id="profile-name" class="text-2xl font-bold">User Name</h2>
+                <p id="profile-username" class="text-primary text-sm mb-2">@username</p>
+                <div class="inline-flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-white/10 mt-1">
+                    <i class="fas fa-star text-gold text-xs"></i>
+                    <span id="profile-level" class="text-xs font-bold uppercase tracking-wider">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="glass-card p-4 rounded-xl mb-6">
+                <h3 class="font-bold text-sm mb-3 text-gray-400">Settings & Appearance</h3>
+                
+                <!-- Theme Toggle -->
+                <div class="flex items-center justify-between py-2 border-b border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <span class="text-sm">Green Theme</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="theme-toggle" class="sr-only peer" onchange="toggleTheme()">
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </div>
+                
+                <!-- Account Status -->
+                <div class="flex items-center justify-between py-2 mt-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <span class="text-sm">Account Status</span>
+                    </div>
+                    <span id="account-status-text" class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">Unverified</span>
+                </div>
+            </div>
+
+            <!-- Refer Area -->
+            <div class="glass-card p-5 rounded-2xl mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold">Refer & Earn</h3>
+                    <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded font-bold">10% Lifetime</span>
+                </div>
+                <p class="text-xs text-gray-400 mb-4">Invite friends and earn 10% of their earnings forever. Clicks also count!</p>
+                
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-white/5 mb-3 flex items-center justify-between">
+                    <div class="truncate text-xs text-gray-300 mr-2 font-mono" id="ref-link-display">Loading...</div>
+                    <button onclick="copyRef()" class="text-primary hover:text-white transition"><i class="fas fa-copy text-lg"></i></button>
+                    <input type="hidden" id="ref-link">
+                </div>
+                <button onclick="shareToTelegram()" class="ripple w-full btn-gradient py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                    <i class="fab fa-telegram-plane"></i> Share to Telegram
+                </button>
+            </div>
+
+            <div class="text-center text-xs text-gray-500 mt-8 pb-4">
+                <p>UID: <span id="user-uid" class="font-mono">...</span></p>
+                <p class="mt-1">Version 1.0.0 NEW</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav-glass fixed bottom-0 w-full z-40">
+        <div class="flex justify-between items-center px-6 py-2">
+            <button onclick="switchTab('home')" class="nav-btn active flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition w-12" data-target="home">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </button>
+            <button onclick="switchTab('earn')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition w-12" data-target="earn">
+                <i class="fas fa-layer-group text-xl"></i>
+                <span class="text-[10px] font-medium">Earn</span>
+            </button>
+            
+            <!-- Center FAB -->
+            <div class="relative -top-6">
+                <button onclick="watchAd()" class="ripple w-14 h-14 rounded-full btn-gradient flex items-center justify-center text-white shadow-lg shadow-primary/40 border-4 border-slate-900 animate-pulse active:scale-95 transition">
+                    <i class="fas fa-play text-xl ml-1"></i>
+                </button>
+            </div>
+
+            <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition w-12" data-target="wallet">
+                <i class="fas fa-wallet text-xl"></i>
+                <span class="text-[10px] font-medium">Wallet</span>
+            </button>
+            <button onclick="switchTab('profile')" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition w-12" data-target="profile">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-[10px] font-medium">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update, onValue, push, serverTimestamp, increment, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        // --- FIREBASE CONFIGURATION (REPLACE WITH YOURS) ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyDUvihR-Ot3pw9186_3ByliVEJGAlbiyVk",
+  authDomain: "earnway-b09b5.firebaseapp.com",
+  databaseURL: "https://earnway-b09b5-default-rtdb.firebaseio.com",
+  projectId: "earnway-b09b5",
+  storageBucket: "earnway-b09b5.firebasestorage.app",
+  messagingSenderId: "451468870738",
+  appId: "1:451468870738:web:f9b5debadb63cc8d800b8b"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const tg = window.Telegram.WebApp;
+
+        // --- GLOBAL VARIABLES ---
+        let currentUser = null;
+        let adminSettings = {
+            adReward: 0.50,
+            minWithdraw: 50,
+            dailyAdLimit: 20,
+            notice: "Welcome to Earnway Pro! Complete tasks to earn money. Verification is required for withdrawal!",
+            verifyFee: 100,
+            verifyNumber: "01xxxxxxxxx",
+            paymentMethod: "Bkash Only"
+        };
+        let botUsername = "Earneway_Bot"; // Placeholder
+
+        // --- INITIALIZATION ---
+        tg.expand();
+        // Theme Init
+        if(localStorage.getItem('theme') === 'green') {
+            document.body.classList.add('theme-green');
+            document.getElementById('theme-toggle').checked = true;
+        }
+
+        const triggerHaptic = (style = 'medium') => {
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred(style);
+        };
+
+        async function initApp() {
+            // টেলিগ্রাম ডাটা নেওয়া
+            const telegramUser = tg.initDataUnsafe?.user || { 
+                id: 12345678, 
+                first_name: "TestUser", 
+                username: "testuser", 
+                photo_url: null 
+            }; 
+            
+            const userId = telegramUser.id.toString();
+            // 👇 রেফারেল কোড ধরার আসল নিয়ম
+            const startParam = tg.initDataUnsafe?.start_param || null;
+
+            if(tg.initDataUnsafe?.bot_username) botUsername = tg.initDataUnsafe.bot_username;
+
+            // Admin Settings Load
+            onValue(ref(db, 'settings'), (snap) => {
+                if(snap.exists()) {
+                    adminSettings = { ...adminSettings, ...snap.val() };
+                    updateSettingsUI();
+                }
+            });
+
+            // ইউজার চেক করা
+            const userRef = ref(db, 'users/' + userId);
+            onValue(userRef, async (snapshot) => {
+                const data = snapshot.val();
+                
+                // === নতুন ইউজার হলে ===
+                if (!data) {
+                    let referrerId = null;
+                    
+                    // ১. রেফারেল চেক এবং বোনাস দেওয়া
+                    if(startParam && startParam !== userId) {
+                        referrerId = startParam;
+                        
+                        // রেফারারকে খুঁজে বের করা এবং বোনাস দেওয়া
+                        const referrerRef = ref(db, 'users/' + startParam);
+                        const refSnap = await get(referrerRef);
+                        
+                        if(refSnap.exists()) {
+                            // এডমিন প্যানেল থেকে সেট করা রেফার বোনাস, না থাকলে ডিফল্ট ২ টাকা
+                            const bonus = parseFloat(adminSettings.refBonus) || 2.00; 
+                            
+                            await update(referrerRef, {
+                                referrals: increment(1), // রেফার কাউন্ট ১ বাড়লো
+                                balance: increment(bonus), // ব্যালেন্স বাড়লো
+                                totalEarned: increment(bonus)
+                            });
+                        }
+                    }
+
+                    // ২. নতুন ইউজারের ডাটা সেট করা
+                    const newUser = {
+                        id: userId,
+                        name: telegramUser.first_name,
+                        username: telegramUser.username || 'user',
+                        photo: telegramUser.photo_url || `https://ui-avatars.com/api/?name=${telegramUser.first_name}&background=random`,
+                        balance: 0, // সাইন আপ বোনাস চাইলে এখানে বাড়াতে পারেন
+                        adsWatched: 0,
+                        dailyAdsWatched: 0,
+                        lastAdDate: '',
+                        joined: serverTimestamp(),
+                        referredBy: referrerId, // কার মাধ্যমে এসেছে তা সেভ থাকলো
+                        isVerified: false,
+                        verifyStatus: 'unverified'
+                    };
+                    
+                    await set(userRef, newUser);
+                    
+                } else {
+                    // === পুরাতন ইউজার ===
+                    currentUser = data;
+                    updateUI(data);
+                    checkVerificationStatus(data);
+                }
+                
+                // লোডিং বন্ধ করা
+                setTimeout(() => {
+                    const loader = document.getElementById('loading-screen');
+                    if(loader) {
+                        loader.classList.add('opacity-0');
+                        setTimeout(() => loader.style.display = 'none', 500);
+                    }
+                }, 800);
+            });
+
+            loadLinkTasks();
+            // loadLeaderboard(); <--- এই লাইনটি মুছে ফেলা হয়েছে কারণ এটি এরর দিচ্ছিল
+        }
+
+        function updateSettingsUI() {
+            document.getElementById('ad-rate').innerText = parseFloat(adminSettings.adReward).toFixed(2);
+            document.getElementById('notice-text').innerText = adminSettings.notice;
+            document.getElementById('verify-fee-display').innerText = adminSettings.verifyFee;
+            document.getElementById('admin-number').innerText = adminSettings.verifyNumber;
+            document.getElementById('payment-method-name').innerText = adminSettings.paymentMethod || "Method";
+        }
+
+        function updateUI(user) {
+            // Text Updates
+            document.getElementById('user-name').innerText = user.name;
+            document.getElementById('header-balance').innerText = parseFloat(user.balance).toFixed(2);
+            document.getElementById('main-balance').innerText = parseFloat(user.balance).toFixed(2);
+            document.getElementById('wallet-balance').innerText = parseFloat(user.balance).toFixed(2);
+            
+            // Image Updates
+            const photo = user.photo || `https://ui-avatars.com/api/?name=${user.name}`;
+            document.getElementById('user-avatar').src = photo;
+            document.getElementById('profile-avatar-big').src = photo;
+            
+            // Profile Info
+            document.getElementById('profile-name').innerText = user.name;
+            document.getElementById('profile-username').innerText = user.username ? '@' + user.username : '';
+            document.getElementById('user-uid').innerText = user.id;
+            
+            // Stats
+            document.getElementById('stats-ads').innerText = user.adsWatched || 0;
+            document.getElementById('stats-refs').innerText = user.referrals || 0;
+
+            // Generate Ref Link
+            const link = `https://t.me/${botUsername}/app?startapp=${user.id}`;
+            
+            // লিংক ইনপুটে সেট করা
+            const refInput = document.getElementById('ref-link');
+            const refDisplay = document.getElementById('ref-link-display');
+            
+            if(refInput) refInput.value = link;
+            if(refDisplay) refDisplay.innerText = link;
+
+            // Level Logic
+            let level = "Bronze";
+            if(user.balance > 1000) level = "Silver";
+            if(user.balance > 5000) level = "Gold";
+            if(user.isVerified) level += " Pro";
+            document.getElementById('user-level').innerText = level;
+            document.getElementById('profile-level').innerText = level;
+
+            // Check Channel Join
+            if(user.joinedChannel) {
+                const btn = document.getElementById('btn-join');
+                btn.innerText = "Joined";
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            }
+        }
+
+        // --- VERIFICATION SYSTEM ---
+        function checkVerificationStatus(user) {
+            const badge = document.getElementById('verified-badge');
+            const statusInd = document.getElementById('status-indicator');
+            const pBadge = document.getElementById('profile-verify-badge');
+            const statusText = document.getElementById('account-status-text');
+            const verifyBtnCard = document.getElementById('verify-btn-card');
+            const verifyWarning = document.getElementById('verify-warning');
+
+            if(user.isVerified) {
+                // Verified State
+                badge.className = "fas fa-check-circle text-sm text-blue-400 ml-1";
+                statusInd.className = "absolute bottom-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-slate-900";
+                pBadge.className = "absolute bottom-2 right-2 bg-blue-500 w-6 h-6 rounded-full border-2 border-slate-900 flex items-center justify-center text-[10px] text-white";
+                pBadge.innerHTML = '<i class="fas fa-check"></i>';
+                statusText.innerText = "Verified";
+                statusText.className = "text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded";
+                verifyBtnCard.classList.add('hidden');
+                verifyWarning.classList.add('hidden');
+            } else if (user.verifyStatus === 'pending') {
+                // Pending State
+                statusText.innerText = "Pending";
+                statusText.className = "text-xs font-bold text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded";
+                verifyBtnCard.classList.add('hidden'); // Hide button if pending
+            } else {
+                // Unverified State
+                verifyBtnCard.classList.remove('hidden');
+                verifyWarning.classList.remove('hidden');
+            }
+        }
+
+        window.openVerifyModal = () => {
+            if(currentUser.isVerified) return Swal.fire('Verified', 'You are already a verified member!', 'success');
+            if(currentUser.verifyStatus === 'pending') return Swal.fire('Pending', 'Your request is under review.', 'info');
+            
+            triggerHaptic();
+            document.getElementById('verify-modal').classList.remove('hidden');
+        };
+
+        window.closeVerifyModal = () => {
+            document.getElementById('verify-modal').classList.add('hidden');
+        };
+
+        window.submitVerification = async () => {
+            triggerHaptic();
+            const trx = document.getElementById('verify-trx').value;
+            if(trx.length < 4) return Swal.fire('Error', 'Invalid Transaction ID', 'error');
+            
+            // Save Request to Firebase
+            const reqRef = push(ref(db, 'verification_requests'));
+            await set(reqRef, {
+                uid: currentUser.id,
+                name: currentUser.name,
+                amount: adminSettings.verifyFee,
+                trxId: trx,
+                timestamp: serverTimestamp(),
+                status: 'pending'
+            });
+
+            // Update User Status
+            await update(ref(db, 'users/' + currentUser.id), {
+                verifyStatus: 'pending'
+            });
+
+            closeVerifyModal();
+            Swal.fire({
+                icon: 'success',
+                title: 'Submitted!',
+                text: 'Admin will verify your payment shortly.',
+                confirmButtonColor: '#6366f1'
+            });
+        };
+
+        // --- TASK SYSTEM (LINKS) ---
+        function loadLinkTasks() {
+            const linksRef = ref(db, 'links'); // Admin should add links here
+            onValue(linksRef, (snap) => {
+                const container = document.getElementById('link-tasks-container');
+                container.innerHTML = '';
+                
+                if(!snap.exists()) {
+                    container.innerHTML = '<p class="text-center text-xs text-gray-500">No tasks available right now.</p>';
+                    return;
+                }
+
+                snap.forEach(child => {
+                    const task = child.val();
+                    const taskId = child.key;
+                    // Check if user already did this task (need a sub-node for task_history)
+                    // Simplified: Just showing all for now, logic below checks completion
+                    
+                    const div = document.createElement('div');
+                    div.className = "glass-card p-3 rounded-xl flex items-center justify-between";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-sm">${task.title || 'Visit Link'}</h4>
+                                <p class="text-[10px] text-gray-400">${task.reward || 1} BDT</p>
+                            </div>
+                        </div>
+                        <button class="bg-white/10 px-3 py-1.5 rounded-lg text-xs hover:bg-white/20 transition" onclick="clickLink('${taskId}', '${task.url}', ${task.reward})">Go</button>
+                    `;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Auto Login & Reward on Link Click
+        window.clickLink = (taskId, url, reward) => {
+            triggerHaptic();
+            // Store that user clicked
+            const clickRef = ref(db, `users/${currentUser.id}/task_history/${taskId}`);
+            
+            get(clickRef).then((snap) => {
+                if(snap.exists()) {
+                    Swal.fire('Completed', 'You already claimed this reward.', 'warning');
+                } else {
+                    // Open Link
+                    tg.openLink(url);
+                    
+                    // Simulate Wait & Reward (In a real app, backend verification is better)
+                    Swal.fire({
+                        title: 'Checking...',
+                        text: 'Stay on the page for 10 seconds...',
+                        timer: 10000,
+                        timerProgressBar: true,
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    }).then((result) => {
+                        if (result.dismiss === Swal.DismissReason.timer) {
+                            // Give Reward
+                            update(ref(db, `users/${currentUser.id}`), {
+                                balance: increment(parseFloat(reward)),
+                                totalEarned: increment(parseFloat(reward))
+                            });
+                            // Mark as done
+                            set(clickRef, { timestamp: serverTimestamp() });
+                            
+                            // Referrer Commission
+                            if(currentUser.referredBy) {
+                                update(ref(db, `users/${currentUser.referredBy}`), {
+                                    balance: increment(reward * 0.10)
+                                });
+                            }
+                            
+                            triggerHaptic('success');
+                            Swal.fire('Success', `+${reward} BDT Added!`, 'success');
+                        }
+                    });
+                }
+            });
+        };
+
+        // --- EARNING LOGIC ---
+window.watchAd = () => {
+    triggerHaptic();
+
+    // আজকের তারিখ বের করা
+    const today = new Date().toDateString();
+    
+    // ডাটাবেস থেকে বর্তমান কাউন্ট নেওয়া, যদি তারিখ বদলে যায় তবে ০ ধরা হবে
+    const currentDaily = (currentUser.lastAdDate === today) ? (currentUser.dailyAdsWatched || 0) : 0;
+    const limit = adminSettings.dailyAdLimit || 20; // ডিফল্ট ১৫ টি
+
+    // লিমিট চেক করা
+    if (currentDaily >= limit) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Daily Limit Reached',
+            text: `You have watched ${currentDaily}/${limit} ads today. Come back tomorrow!`,
+            confirmButtonColor: '#6366f1'
+        });
+    }
+
+    // অ্যাড দেখানো
+    if (typeof show_10075117 === 'function') {
+        show_10075117().then(() => giveAdReward(today, currentDaily));
+    } else {
+        // Fallback for testing
+        Swal.fire({
+            title: 'Loading Ad',
+            timer: 2000,
+            didOpen: () => Swal.showLoading()
+        }).then(() => giveAdReward(today, currentDaily));
+    }
+};
+
+function giveAdReward(today, currentDaily) {
+    const reward = parseFloat(adminSettings.adReward);
+    
+    // ডাটাবেস আপডেট (ব্যালেন্স + ডেইলি কাউন্ট + তারিখ)
+    update(ref(db, 'users/' + currentUser.id), {
+        balance: increment(reward),
+        adsWatched: increment(1),
+        totalEarned: increment(reward),
+        dailyAdsWatched: currentDaily + 1, // নতুন কাউন্ট
+        lastAdDate: today // আজকের তারিখ সেট করা
+    });
+
+    // Referrer Commission
+    if(currentUser.referredBy) {
+        update(ref(db, `users/${currentUser.referredBy}`), {
+            balance: increment(reward * 0.10)
+        });
+    }
+
+    triggerHaptic('success');
+    
+    // ইউজারকে দেখানো যে কতগুলো বাকি আছে
+    const limit = adminSettings.dailyAdLimit || 20;
+    Swal.fire({ 
+        icon: 'success', 
+        title: 'Rewarded!', 
+        text: `+${reward} BDT. (${currentDaily + 1}/${limit} today)`, 
+        toast: true, 
+        position: 'top', 
+        showConfirmButton: false, 
+        timer: 2000 
+    });
+}
+
+        window.dailyCheckIn = async () => {
+            triggerHaptic();
+            const date = new Date().toDateString();
+            if(currentUser.lastCheckIn === date) return Swal.fire('Oops', 'Already checked in today!', 'warning');
+            
+            await update(ref(db, 'users/' + currentUser.id), {
+                balance: increment(1.00),
+                lastCheckIn: date,
+                totalEarned: increment(1.00)
+            });
+            triggerHaptic('success');
+            Swal.fire('Daily Bonus', 'You received 1.00 BDT', 'success');
+        };
+
+        window.joinChannel = () => {
+            tg.openTelegramLink("https://t.me/codelibraryofficial"); // Replace
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'Did you join?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                }).then((res) => {
+                    if(res.isConfirmed) {
+                        update(ref(db, 'users/' + currentUser.id), {
+                            balance: increment(5.00),
+                            joinedChannel: true,
+                            totalEarned: increment(5.00)
+                        });
+                        Swal.fire('Success', '5 BDT Added', 'success');
+                    }
+                });
+            }, 3000);
+        };
+
+        // --- WITHDRAW LOGIC ---
+        window.selectMethod = (el, method) => {
+            triggerHaptic('light');
+            document.querySelectorAll('#withdraw-form .glass-card').forEach(c => c.classList.remove('border-primary', 'bg-primary/10'));
+            el.classList.add('border-primary', 'bg-primary/10');
+            document.getElementById('withdraw-method').value = method;
+        };
+
+        window.handleWithdraw = (e) => {
+            e.preventDefault();
+            triggerHaptic();
+            
+            if(!currentUser.isVerified) return Swal.fire({
+                icon: 'error', 
+                title: 'Verification Required', 
+                text: 'Please verify your account from Profile or Home screen to withdraw.',
+                confirmButtonText: 'Verify Now'
+            }).then((r) => { if(r.isConfirmed) openVerifyModal() });
+
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const number = document.getElementById('withdraw-number').value;
+            const method = document.getElementById('withdraw-method').value;
+            const min = parseFloat(adminSettings.minWithdraw);
+
+            if(!method) return Swal.fire('Error', 'Select a payment method', 'error');
+            if(amount < min) return Swal.fire('Error', `Minimum withdraw is ${min} BDT`, 'error');
+            if(amount > currentUser.balance) return Swal.fire('Error', 'Insufficient balance', 'error');
+
+            // Deduct & Request
+            update(ref(db, 'users/' + currentUser.id), {
+                balance: increment(-amount),
+                totalWithdrawn: increment(amount)
+            }).then(() => {
+                const wRef = push(ref(db, 'withdrawals'));
+                set(wRef, {
+                    uid: currentUser.id,
+                    name: currentUser.name,
+                    amount: amount,
+                    method: method,
+                    number: number,
+                    status: 'pending',
+                    date: serverTimestamp()
+                });
+
+                // Update UI History
+                const list = document.getElementById('tx-history');
+                const html = `
+                    <div class="glass-card p-3 rounded-xl flex justify-between items-center border-l-4 border-yellow-500 animate__animated animate__fadeIn">
+                        <div><p class="font-bold text-sm">${method}</p><p class="text-[10px] text-gray-400">Just now</p></div>
+                        <span class="font-bold text-red-400">-${amount} ৳</span>
+                    </div>`;
+                if(list.innerText.includes('No transactions')) list.innerHTML = '';
+                list.insertAdjacentHTML('afterbegin', html);
+
+                triggerHaptic('success');
+                Swal.fire('Success', 'Withdrawal requested successfully!', 'success');
+                e.target.reset();
+            });
+        };
+
+        // --- UTILS ---
+        window.switchTab = (tab) => {
+            triggerHaptic('light');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + '-section').classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === tab) {
+                    btn.classList.add('active', 'text-primary');
+                    btn.classList.remove('text-gray-400');
+                } else {
+                    btn.classList.remove('active', 'text-primary');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+        };
+
+        window.toggleTheme = () => {
+            triggerHaptic();
+            const body = document.body;
+            body.classList.toggle('theme-green');
+            if(body.classList.contains('theme-green')) {
+                localStorage.setItem('theme', 'green');
+            } else {
+                localStorage.removeItem('theme');
+            }
+        };
+
+        window.copyRef = () => {
+            triggerHaptic();
+            const copyText = document.getElementById("ref-link");
+            navigator.clipboard.writeText(copyText.value);
+            Swal.fire({ icon: 'success', title: 'Copied!', toast: true, position: 'top', showConfirmButton: false, timer: 1500 });
+        };
+
+        window.shareToTelegram = () => {
+            triggerHaptic();
+            const link = document.getElementById("ref-link").value;
+            const msg = "Join this amazing earning bot and earn real money! 💰\n" + link;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
+        };
+
+        // --- LEADERBOARD LOGIC (PRO VERSION) ---
+
+window.openLeaderboard = () => {
+    triggerHaptic();
+    document.getElementById('leaderboard-page').classList.remove('hidden');
+    loadLeaderboardData('balance'); // Default Load
+};
+
+window.closeLeaderboard = () => {
+    const page = document.getElementById('leaderboard-page');
+    page.classList.add('animate__fadeOut');
+    setTimeout(() => {
+        page.classList.add('hidden');
+        page.classList.remove('animate__fadeOut');
+    }, 300);
+};
+
+window.loadLeaderboardData = (type) => {
+    triggerHaptic('light');
+    
+    // 1. Tab Animation
+    const indicator = document.getElementById('tab-indicator');
+    if(type === 'balance') {
+        indicator.style.transform = 'translateX(0%)';
+    } else {
+        indicator.style.transform = 'translateX(100%)';
+    }
+
+    const top3Cont = document.getElementById('top-3-container');
+    const listCont = document.getElementById('leaderboard-list-items');
+    const footer = document.getElementById('my-rank-footer');
+    
+    // Loading State
+    listCont.innerHTML = '<div class="text-center py-10 text-gray-500 text-xs"><i class="fas fa-circle-notch fa-spin text-2xl mb-2 text-primary"></i><br>Syncing Data...</div>';
+
+    // 2. Fetch Data (Top 50)
+    const sortKey = type === 'balance' ? 'balance' : 'referrals';
+    
+    // Firebase Query: Sort by balance/refs, Limit to last 50 (Higher values come last in Firebase)
+    const q = query(ref(db, 'users'), orderByChild(sortKey), limitToLast(50));
+
+    onValue(q, (snapshot) => {
+        let users = [];
+        snapshot.forEach((child) => {
+            users.push(child.val());
+        });
+        
+        // Reverse to get Highest first
+        users.reverse();
+
+        // 3. Render Top 3 Podium
+        let podiumHTML = '';
+        
+        // --- 2nd Place (Left) ---
+        if(users[1]) {
+            podiumHTML += `
+            <div class="flex flex-col items-center animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="relative w-20 h-20 mb-2">
+                    <div class="absolute -top-3 -left-2 text-2xl">🥈</div>
+                    <div class="poly-shape w-full h-full bg-slate-700 glow-2">
+                        <img src="${users[1].photo}" alt="2nd">
+                    </div>
+                    <div class="absolute -bottom-2 w-full text-center">
+                        <span class="bg-slate-700 border border-slate-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">#2</span>
+                    </div>
+                </div>
+                <p class="text-xs font-bold text-gray-300 w-20 truncate text-center mb-1">${users[1].name.split(' ')[0]}</p>
+                <p class="text-[10px] text-gray-400 font-mono bg-white/5 px-2 rounded">${formatValue(users[1][sortKey], type)}</p>
+            </div>`;
+        }
+
+        // --- 1st Place (Center - Big) ---
+        if(users[0]) {
+            podiumHTML += `
+            <div class="flex flex-col items-center mx-1 z-10 animate__animated animate__fadeInUp">
+                <div class="relative w-28 h-28 mb-3">
+                    <i class="fas fa-crown text-4xl text-yellow-400 absolute -top-8 left-1/2 transform -translate-x-1/2 drop-shadow-lg animate-bounce"></i>
+                    <div class="poly-shape w-full h-full bg-gradient-to-tr from-yellow-400 to-yellow-600 glow-1 p-[3px]">
+                        <img src="${users[0].photo}" alt="1st" class="bg-slate-900">
+                    </div>
+                    <div class="absolute -bottom-3 w-full text-center">
+                        <span class="bg-gradient-to-r from-yellow-500 to-amber-600 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-yellow-300">#1</span>
+                    </div>
+                </div>
+                <p class="text-sm font-bold text-white w-28 truncate text-center mb-1 drop-shadow-md">${users[0].name}</p>
+                <p class="text-xs text-yellow-400 font-bold font-mono bg-yellow-400/10 border border-yellow-400/20 px-3 py-0.5 rounded-lg">${formatValue(users[0][sortKey], type)}</p>
+            </div>`;
+        }
+
+        // --- 3rd Place (Right) ---
+        if(users[2]) {
+            podiumHTML += `
+            <div class="flex flex-col items-center animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="relative w-20 h-20 mb-2">
+                    <div class="absolute -top-3 -right-2 text-2xl">🥉</div>
+                    <div class="poly-shape w-full h-full bg-amber-800 glow-3">
+                        <img src="${users[2].photo}" alt="3rd">
+                    </div>
+                    <div class="absolute -bottom-2 w-full text-center">
+                        <span class="bg-amber-900 border border-amber-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">#3</span>
+                    </div>
+                </div>
+                <p class="text-xs font-bold text-gray-300 w-20 truncate text-center mb-1">${users[2].name.split(' ')[0]}</p>
+                <p class="text-[10px] text-gray-400 font-mono bg-white/5 px-2 rounded">${formatValue(users[2][sortKey], type)}</p>
+            </div>`;
+        }
+        
+        top3Cont.innerHTML = podiumHTML || '<p class="text-white/50 text-xs">Not enough data</p>';
+
+        // 4. Render List (4 to 50)
+        let listHTML = '';
+        const listUsers = users.slice(3); // Everyone else
+        
+        listUsers.forEach((u, index) => {
+            const rank = index + 4;
+            const isMe = u.id.toString() === currentUser.id.toString();
+            const bgClass = isMe ? 'bg-primary/20 border-primary/50' : 'bg-white/5 border-white/5 hover:bg-white/10';
+            
+            listHTML += `
+            <div class="${bgClass} border p-3 rounded-xl flex items-center justify-between transition duration-200">
+                <div class="flex items-center gap-3">
+                    <span class="text-gray-500 font-bold text-xs w-6 text-center font-mono">#${rank}</span>
+                    <img src="${u.photo}" class="w-10 h-10 rounded-full border border-white/10 object-cover">
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-200 truncate w-32 ${isMe ? 'text-primary' : ''}">${u.name} ${isMe ? '(You)' : ''}</h4>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="font-bold text-sm text-white font-mono tracking-tight">${formatValue(u[sortKey], type)}</span>
+                </div>
+            </div>`;
+        });
+        
+        listCont.innerHTML = listHTML || '<p class="text-center text-gray-500 text-xs py-4">No more ranked users.</p>';
+
+        // 5. My Rank Footer Logic
+        const myIndex = users.findIndex(u => u.id.toString() === currentUser.id.toString());
+        
+        // Show footer if I am NOT in the top 10 visible area (Optional: Change 10 to 50 to always show if ranked)
+        // Here: Show if I exist but am below rank 10
+        if (myIndex > 9) {
+            footer.style.transform = 'translateY(0%)'; // Slide Up
+            document.getElementById('my-rank-img').src = currentUser.photo;
+            document.getElementById('my-rank-num').innerText = `#${myIndex + 1}`;
+            document.getElementById('my-rank-score').innerText = formatValue(users[myIndex][sortKey], type);
+            document.getElementById('my-rank-txt').innerText = "You are ranked below top 10";
+        } 
+        else if (myIndex === -1) {
+            // Not in top 50
+            footer.style.transform = 'translateY(0%)'; 
+            document.getElementById('my-rank-img').src = currentUser.photo;
+            document.getElementById('my-rank-num').innerText = "50+";
+            document.getElementById('my-rank-score').innerText = formatValue(currentUser[sortKey], type);
+            document.getElementById('my-rank-txt').innerText = "Play more to get ranked!";
+        } 
+        else {
+            // I am in Top 10, no need for sticky footer
+            footer.style.transform = 'translateY(100%)'; // Slide Down
+        }
+
+    }, { onlyOnce: true });
+};
+
+// Helper Format Function
+function formatValue(val, type) {
+    if(type === 'balance') return '৳ ' + parseFloat(val || 0).toFixed(2);
+    return (val || 0) + ' Refs';
+}
+
+        // Start App
+        initApp();
+    </script>
+</body>
+</html>
